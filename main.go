@@ -23,6 +23,7 @@ func main() {
 	router.GET("/mostactivity", getMostactivity)
 	router.GET("/project", projectcard)
 	router.GET("/commitactivity", repositoryCommitActivity)
+	router.GET("/streak", streak)
 	router.GET("/resonance", resonance)
 
 	// router.Run("localhost:8080")
@@ -97,7 +98,11 @@ func rankList(c *gin.Context) {
 
 	c.String(http.StatusOK, rank.Rankcard(title, users, color))
 }
-
+func streak(c *gin.Context) {
+	c.Header("Content-Type", "image/svg+xml")
+	user := c.Request.FormValue("user")
+	fmt.Println(user)
+}
 func getSkills(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 
