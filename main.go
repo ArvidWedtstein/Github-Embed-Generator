@@ -165,6 +165,7 @@ func resonance(c *gin.Context) {
 	 }
 	}, 60);
 	}
+	anim()
 	// ]]>
 	  </script>
 	  <g id="orbits">
