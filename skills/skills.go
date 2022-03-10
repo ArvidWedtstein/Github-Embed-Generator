@@ -11,7 +11,9 @@ import (
 )
 
 func Skills(title string, languages []string, cardstyle style.Styles) string {
-
+	if title == "" || len(title) <= 0 {
+		title = "Skills"
+	}
 	fmt.Println(cardstyle.Title)
 	height := 700
 	width := 600
