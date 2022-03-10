@@ -7,6 +7,7 @@ import (
 	"githubembedapi/organization"
 	"githubembedapi/project"
 	"githubembedapi/rank"
+	"githubembedapi/streak"
 	"net/http"
 	"strings"
 
@@ -23,11 +24,11 @@ func main() {
 	router.GET("/mostactivity", getMostactivity)
 	router.GET("/project", projectcard)
 	router.GET("/commitactivity", repositoryCommitActivity)
-	router.GET("/streak", streak)
+	router.GET("/streak", userstreak)
 	router.GET("/resonance", resonance)
 
-	// router.Run("localhost:8080")
-	router.Run()
+	router.Run("localhost:8080")
+	// router.Run()
 }
 
 func getMostactivity(c *gin.Context) {
@@ -98,10 +99,11 @@ func rankList(c *gin.Context) {
 
 	c.String(http.StatusOK, rank.Rankcard(title, users, color))
 }
-func streak(c *gin.Context) {
+func userstreak(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 	user := c.Request.FormValue("user")
 	fmt.Println(user)
+	streak.Streak(user)
 }
 func getSkills(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")

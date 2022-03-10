@@ -179,12 +179,23 @@ func Streak(user string) string {
 
 	var resObjectAPI Commits
 	json.Unmarshal(responseDataAPI, &resObjectAPI)
+	currentDate := time.Now()
+	//
+	days := currentDate.Sub(resObjectAPI.Items[0].Commit.Author.Date).Hours() / 24
 
-	var times []time.Time
-	for _, v := range resObjectAPI.Items {
-		t := v.Commit.Author.Date
-		times = append(times, t)
-		days := t2.Sub(t1).Hours() / 24
+	if days < 1 {
+		fmt.Println(days)
 	}
+
+	lastday := currentDate
+	for _, v := range resObjectAPI.Items {
+		if v.Commit.Committer.Date != lastday {
+			fmt.Println("not right day")
+		}
+		lastday = v.Commit.Committer.Date
+	}
+	fmt.Println(lastday)
+	// lag algoritme som sjekker streak / om dagene henger sammen
+
 	return ``
 }
