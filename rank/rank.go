@@ -41,15 +41,13 @@ type Author struct {
 	Avatar_Url string `json:"avatar_url"`
 }
 
-type Styles struct {
-	Title      string
-	Border     string
-	Background string
-	Text       string
-	Textfont   string
-}
-
 func Rankcard(title string, users []string, cardstyle style.Styles) string {
+	if title == "" || len(title) < 1 {
+		title = "Rank"
+	}
+	if len(users) > 5 {
+		users = users[:5]
+	}
 
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,

@@ -15,11 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Icons []struct {
-	Name string `json:"name"`
-	Svg  string `json:"svg"`
-}
-
 func main() {
 	router := gin.Default()
 	router.StaticFS("/static", http.Dir("./static"))
@@ -28,9 +23,8 @@ func main() {
 	router.GET("/mostactivity", getMostactivity)
 	router.GET("/project", projectcard)
 	router.GET("/commitactivity", repositoryCommitActivity)
-	// router.Run("localhost:8080")
+	router.Run("localhost:8080")
 	router.Run()
-
 }
 
 func getMostactivity(c *gin.Context) {
@@ -98,13 +92,6 @@ func rankList(c *gin.Context) {
 	color = style.CheckHex(styles)
 	users := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("users")), ",")
 	title := c.Request.FormValue("title")
-
-	if title == "" || len(title) < 1 {
-		title = "Rank"
-	}
-	if len(users) > 5 {
-		users = users[:5]
-	}
 
 	c.String(http.StatusOK, rank.Rankcard(title, users, color))
 }

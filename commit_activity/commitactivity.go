@@ -7,6 +7,7 @@ import (
 	"githubembedapi/card/style"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -47,14 +48,12 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 	json.Unmarshal(responseDataAPI, &resObjectAPI)
 
 	// Calendar calculation
-	start := time.Date(time.Now().Year(), 1, 1, 0, 0, 0, 0, time.UTC)
-	end := time.Date(time.Now().Year(), 12, 31, 0, 0, 0, 0, time.UTC)
+	// start := time.Date(time.Now().Year(), 1, 1, 0, 0, 0, 0, time.UTC)
+	// end := time.Date(time.Now().Year(), 12, 31, 0, 0, 0, 0, time.UTC)
 
 	// calculate total number of days
-	duration := end.Sub(start)
-	daysOfYear := int(duration.Hours() / 24)
-
-	fmt.Printf("difference %d days", daysOfYear)
+	// duration := end.Sub(start)
+	// daysOfYear := int(duration.Hours() / 24)
 
 	customstyles := []string{
 		`.circle {
@@ -95,7 +94,8 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 	gridPadding := 2
 	gridBoxSize := 10
 
-	if hide_week == "true" {
+	isHideWeek, _ := strconv.ParseBool(hide_week)
+	if isHideWeek {
 		gridYstartPos = 80
 		gridY = gridYstartPos
 	}
