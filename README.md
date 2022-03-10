@@ -13,6 +13,8 @@ Languages are comma seperated
 | /rankList | ?users=user1,user2 |
 | /mostactivity | ?org=devco-morkjebla |
 | /commitactivity | ?user=arvidwedtstein&repo=github-embed-generator |
+| /project | ?user=arvidwedtstein&repo=github-embed-generator |
+
 Example: `https://arvidgithubembed.herokuapp.com/skills?languages=php,mysql,javascript,typescript`
 ### Customization
 
