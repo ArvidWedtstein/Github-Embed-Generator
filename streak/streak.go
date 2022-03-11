@@ -188,14 +188,28 @@ func Streak(user string) string {
 	}
 
 	lastday := currentDate
+	streak := 0
 	for _, v := range resObjectAPI.Items {
+		streak++
 		if v.Commit.Committer.Date != lastday {
-			fmt.Println("not right day")
+			break
 		}
 		lastday = v.Commit.Committer.Date
 	}
-	fmt.Println(lastday)
+	fmt.Printf("LAST DAY: %v\n", lastday)
+	fmt.Printf("STREAk: %v\n", streak)
 	// lag algoritme som sjekker streak / om dagene henger sammen
 
+	streaklength := func() {
+		currentYear, currentMonth, _ := time.Now().Date()
+		currentLocation := time.Now().Location()
+
+		firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
+		lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+		fmt.Printf("first date of month %v\n", firstOfMonth.Day())
+		fmt.Printf("last date of month: %v\n", lastOfMonth.Day())
+	}
+	streaklength()
 	return ``
 }
