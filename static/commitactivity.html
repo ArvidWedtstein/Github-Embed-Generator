@@ -66,7 +66,7 @@
 
             <hr class="my-4">
 
-            <button class="w-100 btn btn-primary btn-lg" @click="displayPreview($event, url = `http://localhost:8080/commitactivity?user=${user}&repo=${repo}&titlecolor=${titleColor.replace('#', '')}&textColor=${textColor.replace('#', '')}&backgroundcolor=${backgroundColor.replace('#', '')}&hide_week=${hideWeek}`), preview = true">Generate</button>
+            <button class="w-100 btn btn-primary btn-lg" @click="displayPreview($event, url = `https://arvidgithubembed.herokuapp.com/commitactivity?user=${user}&repo=${repo}&titlecolor=${titleColor.replace('#', '')}&textColor=${textColor.replace('#', '')}&backgroundcolor=${backgroundColor.replace('#', '')}&hide_week=${hideWeek}`), preview = true">Generate</button>
           </div>
         </div>
       </div>
