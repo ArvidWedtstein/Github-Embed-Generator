@@ -200,6 +200,7 @@ func Project(user, project string, cardstyle style.Styles) string {
 			opacity: 0.4;	
 		}`,
 	}
+
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
 		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
@@ -244,6 +245,5 @@ func Project(user, project string, cardstyle style.Styles) string {
 		fmt.Sprintf(`<text x="440" y="170" id="Deletions" class="text">Com: %v%v</text>`, calculatePercent(commits, goal), "%"),
 		`</g>`,
 	}
-
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 300, customstyles...), "\n")
 }
