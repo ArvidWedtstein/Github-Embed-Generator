@@ -1,5 +1,8 @@
 #### Go API project for generating svg for github embed
 
+# Generator 
+https://arvidgithubembed.herokuapp.com/static/
+
 ## Better description & docs will come soon. (When i have time left)
 
 
@@ -42,6 +45,10 @@ All hex colors without '#' please
 Example: 
 `/ranklist?users=lartrax,arvidwedtstein&bordercolor=black&titlecolor=red&textcolor=green&backgroundcolor=yellow&title=test`
 
+
+> /commitactivity?:user&:repo
+
+![](https://arvidgithubembed.herokuapp.com/commitactivity?user=arvidwedtstein&repo=github-embed-generator&titlecolor=000000&textColor=000000&backgroundcolor=ffffff&hide_week=false)
 # Contribution
 
 Contributions are welcome!
