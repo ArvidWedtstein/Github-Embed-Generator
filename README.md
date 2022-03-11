@@ -46,9 +46,16 @@ Example:
 `/ranklist?users=lartrax,arvidwedtstein&bordercolor=black&titlecolor=red&textcolor=green&backgroundcolor=yellow&title=test`
 
 
+> /mostactivity?org=devco-morkjebla
+
+
 > /commitactivity?:user&:repo
 
 ![](https://arvidgithubembed.herokuapp.com/commitactivity?user=arvidwedtstein&repo=github-embed-generator&titlecolor=000000&textColor=000000&backgroundcolor=ffffff&hide_week=false)
+
+Example:
+`https://arvidgithubembed.herokuapp.com/commitactivity?user=arvidwedtstein&repo=github-embed-generator&titlecolor=000000&textColor=000000&backgroundcolor=ffffff&hide_week=false`
+
 # Contribution
 
 Contributions are welcome!
@@ -58,8 +65,6 @@ Make sure your request is meaningful and you have tested the app locally before 
 
 
 
-> `/mostactivity?org=devco-morkjebla`
 
 
-//https://awesome-github-stats.azurewebsites.net/user-stats/lartrax/rank
 
