@@ -124,7 +124,6 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 			} else if commits >= 20 {
 				color = gitcolors["commit4"]
 			}
-			// grid = append(grid, fmt.Sprintf(`<text style="font-size: 5px" fill="white" x="%v" y="%v">%v</text>`, gridX, gridY, commits))
 			grid = append(grid, fmt.Sprintf(`<rect id="day%v" fill="%v" width="%v" height="%v" rx="2" x="%v" y="%v"></rect>`, days, color, gridBoxSize, gridBoxSize, gridX, gridY))
 			gridY += gridBoxSize + gridPadding
 		}
@@ -135,5 +134,6 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 	grid = append(grid, `</g>`)
 	body = append(body, fmt.Sprintf(`<text style="font-family: Helvetica" x="30" y="70" class="text">Total commits past year: %v</text>`, totalCommits))
 	body = append(body, strings.Join(grid, "\n"))
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, gridX+(paddingX*2), 200, customstyles...), "\n")
+	// return strings.Join(card.GenerateCard(cardstyle, defs, body, gridX+(paddingX*2), 200, customstyles...), "\n")
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, 800, 200, customstyles...), "\n")
 }
