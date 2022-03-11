@@ -27,8 +27,8 @@ func main() {
 	router.GET("/streak", userstreak)
 	router.GET("/resonance", resonance)
 
-	router.Run("localhost:8080")
-	// router.Run()
+	// router.Run("localhost:8080")
+	router.Run()
 }
 
 func getMostactivity(c *gin.Context) {
