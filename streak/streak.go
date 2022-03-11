@@ -3,8 +3,12 @@ package streak
 import (
 	"encoding/json"
 	"fmt"
+	"githubembedapi/card"
+	"githubembedapi/card/style"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -25,10 +29,41 @@ type Commits struct {
 	} `json:"contributions"`
 }
 
-func Streak(user string) string {
+func Streak(user string, cardstyle style.Styles) string {
+	height := 300
+	width := 600
+	strokewidth := 3
+	customstyles := []string{
+		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
+		`.streakcircle {`,
+		`fill: none;`,
+		fmt.Sprintf(`stroke: %v;`, cardstyle.Border),
+		fmt.Sprintf(`stroke-width: %v;`, strokewidth),
+		`}`,
+		`.box {
+			fill: ` + cardstyle.Background + `;
+			border: 3px solid #` + cardstyle.Border + `;
+			stroke: ` + cardstyle.Border + `;
+			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
+		}`,
+	}
+	defs := []string{
+		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
+		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+	}
+
+	body := []string{
+		fmt.Sprintf(`<rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width, height),
+		fmt.Sprintf(`<text x="20" y="35" class="title">%s</text>`, card.ToTitleCase("Streak")),
+	}
+
+	bodyAdd := func(content string) string {
+		body = append(body, content)
+		return content
+	}
+
 	currentDate := time.Now()
 	year := currentDate.Year()
-	// url := "https://api.github.com/search/commits?q=author:" + user + "&sort=author-date&order=desc&page=1"
 	url := fmt.Sprintf("https://skyline.github.com/%v/%v.json", user, year)
 	recoverFromError := func() {
 		if r := recover(); r != nil {
@@ -56,13 +91,6 @@ func Streak(user string) string {
 	var resObjectAPI Commits
 	json.Unmarshal(responseDataAPI, &resObjectAPI)
 
-	//
-	// days := currentDate.Sub(resObjectAPI.Items[0].Commit.Author.Date).Hours() / 24
-
-	// if days < 1 {
-	// 	fmt.Println(days)
-	// }
-
 	_, currentweek := currentDate.ISOWeek()
 	streak := 0
 	var weeks []struct {
@@ -79,8 +107,8 @@ func Streak(user string) string {
 		}
 	}
 out1:
-	for i := len(weeks) - 1; i >= 0; i-- {
-		for b := len(weeks[i].Days) - 1; b >= 0; b-- {
+	for i := len(weeks) - 1; i >= 0; i-- { // Loop through weeks
+		for b := len(weeks[i].Days) - 1; b >= 0; b-- { // Loop though days
 			if i == len(weeks)-1 && b+1 <= int(currentDate.Weekday()) {
 				if weeks[i].Days[b].Count > 0 {
 					streak++
@@ -96,19 +124,10 @@ out1:
 			}
 		}
 	}
-	fmt.Printf("STREAk: %v\n", streak)
-	// lag algoritme som sjekker streak / om dagene henger sammen
+	bodyAdd(fmt.Sprintf(`<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg" fill="red" x="%v" y="%v" viewBox="0 0 384 512"><path stroke="#ffffff" stroke-width="3px" d="M216 23.86c0-23.8-30.65-32.77-44.15-13.04C48 191.85 224 200 224 288c0 35.63-29.11 64.46-64.85 63.99-35.17-.45-63.15-29.77-63.15-64.94v-85.51c0-21.7-26.47-32.23-41.43-16.5C27.8 213.16 0 261.33 0 320c0 105.87 86.13 192 192 192s192-86.13 192-192c0-170.29-168-193-168-296.14z"/></svg>`, (width/2)-25, (height/2)-100))
+	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" cx="%v" cy="%v" r="80"></circle>`, width/2, height/2))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" class="title">%v</text>`, (width/2)-13, (height/2)+10, streak))
+	fmt.Printf("Streak: %v\n", streak)
 
-	streaklength := func() {
-		currentYear, currentMonth, _ := time.Now().Date()
-		currentLocation := time.Now().Location()
-
-		firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
-		lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
-
-		fmt.Printf("first date of month %v\n", firstOfMonth.Day())
-		fmt.Printf("last date of month: %v\n", lastOfMonth.Day())
-	}
-	streaklength()
-	return ``
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, customstyles...), "\n")
 }

@@ -102,8 +102,16 @@ func rankList(c *gin.Context) {
 func userstreak(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 	user := c.Request.FormValue("user")
-	fmt.Println(user)
-	streak.Streak(user)
+
+	var color style.Styles
+	styles := map[string]string{
+		"Title":      c.Request.FormValue("titlecolor"),
+		"Border":     c.Request.FormValue("bordercolor"),
+		"Background": c.Request.FormValue("backgroundcolor"),
+		"Text":       c.Request.FormValue("textcolor"),
+	}
+	color = style.CheckHex(styles)
+	c.String(http.StatusOK, streak.Streak(user, color))
 }
 func getSkills(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
