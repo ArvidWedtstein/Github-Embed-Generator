@@ -30,8 +30,8 @@ type Commits struct {
 }
 
 func Streak(user, hide_title string, cardstyle style.Styles) string {
-	height := 300
-	width := 600
+	height := 200
+	width := 400
 	strokewidth := 8
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
@@ -46,14 +46,15 @@ func Streak(user, hide_title string, cardstyle style.Styles) string {
 			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
 		}`,
 		`.streaktxt {
-			font-size: 50px;
+			font-size: 40px;
 			font-family: Helvetica;
 			font-weight: 600;
 			fill: ` + cardstyle.Text + `;
 		}`,
 		`.mediantxt {
-			font-size: 30px;	
+			font-size: 24px;	
 		}`,
+		`.titletxt { font-size: 16px;}`,
 	}
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
@@ -137,13 +138,13 @@ out1:
 			}
 		}
 	}
-	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" stroke-width="5" cx="%v" cy="%v" r="80"></circle>`, width/2, height/2))
-	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" stroke-width="%v" filter="url(#wavy) blur(3px)" cx="%v" cy="%v" r="80"></circle>`, strokewidth, width/2, height/2))
+	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" stroke-width="5" cx="%v" cy="%v" r="50"></circle>`, width/2, height/2))
+	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" stroke-width="%v" filter="url(#wavy) blur(3px)" cx="%v" cy="%v" r="50"></circle>`, strokewidth, width/2, height/2))
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="streaktxt">%v</text>`, (width / 2), (height/2)+15, streak))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)+200, (height/2)+5, resObjectAPI.Max))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="text">Highest Commit</text>`, (width/2)+200, (height/2)-30))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)-200, (height/2)+5, resObjectAPI.Median))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="text">Median</text>`, (width/2)-200, (height/2)-30))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)+130, (height/2)+5, resObjectAPI.Max))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Highest Commit</text>`, (width/2)+130, (height/2)-30))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)-130, (height/2)+5, resObjectAPI.Median))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Median</text>`, (width/2)-130, (height/2)-30))
 
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, customstyles...), "\n")
 }

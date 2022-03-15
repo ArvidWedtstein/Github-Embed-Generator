@@ -110,7 +110,7 @@ func WavyFilter() string {
         numOctaves="5" result="turbulence">
 		<animate attributeName="baseFrequency" dur="30s" values="0.01;0.005;0.02;0.009" repeatCount="indefinite" />
 		</feTurbulence>
-		<feDisplacementMap in="SourceGraphic" scale="30" />
+		<feDisplacementMap in="SourceGraphic" scale="20" />
 		
 	</filter>"
 	`
