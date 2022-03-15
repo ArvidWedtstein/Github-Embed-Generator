@@ -103,6 +103,36 @@ func StarPattern() string {
 	<polygon points="0,0 2,5 0,10 5,8 10,10 8,5 10,0 5,2"/>
 	  </pattern>`
 }
+func WavyFilter() string {
+	return `
+	<filter id="wavy">
+		<feTurbulence type="fractalNoise" baseFrequency="0.009"
+        numOctaves="5" result="turbulence">
+		<animate attributeName="baseFrequency" dur="30s" values="0.01;0.005;0.02;0.009" repeatCount="indefinite" />
+		</feTurbulence>
+		<feDisplacementMap in="SourceGraphic" scale="30" />
+		
+	</filter>"
+	`
+}
+func Table() string {
+	return `<filter id="table" x="0" y="0" width="100%" height="100%">
+	<feComponentTransfer>
+	  <feFuncR type="table" tableValues="0 0 1 1"></feFuncR>
+	  <feFuncG type="table" tableValues="1 1 0 0"></feFuncG>
+	  <feFuncB type="table" tableValues="0 1 1 0"></feFuncB>
+	</feComponentTransfer>
+  </filter>`
+}
+func RoughPaper() string {
+	return `<filter id='roughpaper' x='0%' y='0%' width='100%' height="100%">
+	<feTurbulence type="fractalNoise" baseFrequency='0.04' result='noise' numOctaves="5" />
+	<feDiffuseLighting in='noise' lighting-color='white' surfaceScale='2'>
+		<feDistantLight azimuth='45' elevation='60' />
+</feDiffuseLighting>
+
+</filter>`
+}
 func StarsFilter() string {
 	// feColorMatrix
 	//------------------

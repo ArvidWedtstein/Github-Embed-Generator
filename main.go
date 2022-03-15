@@ -111,7 +111,8 @@ func userstreak(c *gin.Context) {
 		"Text":       c.Request.FormValue("textcolor"),
 	}
 	color = style.CheckHex(styles)
-	c.String(http.StatusOK, streak.Streak(user, color))
+	hide_title := c.Request.FormValue("hide_title")
+	c.String(http.StatusOK, streak.Streak(user, hide_title, color))
 }
 func getSkills(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
