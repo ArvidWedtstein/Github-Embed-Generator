@@ -57,7 +57,7 @@ func HorizontalFlexBox(width, posX, posY, padding int, content []string) string 
 	x := posX
 	y := posY
 	// Make new group
-	gridLayout := []string{fmt.Sprintf(`<g data-testid="flexbox"> transform="translate(%v,%v)"`, posX, posY)}
+	gridLayout := []string{fmt.Sprintf(`<g transform="translate(%v,%v)">`, posX, posY)}
 	for _, item := range content {
 		items := strings.Split(item, ` `)
 		var itemwidth int
@@ -84,8 +84,8 @@ func HorizontalFlexBox(width, posX, posY, padding int, content []string) string 
 				}
 			}
 		}
-		item = strings.ReplaceAll(item, `x=""`, fmt.Sprintf(`x="%v"`, x))
-		item = strings.ReplaceAll(item, `y=""`, fmt.Sprintf(`y="%v"`, y))
+		item = strings.Replace(item, `x=""`, fmt.Sprintf(`x="%v"`, x), 1)
+		item = strings.Replace(item, `y=""`, fmt.Sprintf(`y="%v"`, y), 1)
 		gridLayout = append(gridLayout, item)
 
 		if x+((itemwidth*2)+padding) >= width {
@@ -101,7 +101,7 @@ func HorizontalFlexBox(width, posX, posY, padding int, content []string) string 
 func VerticalFlexBox(height, posX, posY, padding int, content []string) string {
 	x := posX
 	y := posY
-	gridLayout := []string{fmt.Sprintf(`<g data-testid="flexbox"> transform="translate(%v,%v)"`, posX, posY)}
+	gridLayout := []string{fmt.Sprintf(`<g height="300" transform="translate(%v,%v)">`, posX, posY)}
 	for _, item := range content {
 		items := strings.Split(item, ` `)
 		var itemwidth int
@@ -130,8 +130,13 @@ func VerticalFlexBox(height, posX, posY, padding int, content []string) string {
 				}
 			}
 		}
-		item = strings.ReplaceAll(item, `x=""`, fmt.Sprintf(`x="%v"`, x))
-		item = strings.ReplaceAll(item, `y=""`, fmt.Sprintf(`y="%v"`, y))
+		if strings.Contains(item, "<g") {
+			item = strings.ReplaceAll(item, `translate(0,0)`, fmt.Sprintf(`translate(%v,%v)`, x, y))
+		} else {
+			item = strings.ReplaceAll(item, `x=""`, fmt.Sprintf(`x="%v"`, x))
+			item = strings.ReplaceAll(item, `y=""`, fmt.Sprintf(`y="%v"`, y))
+		}
+
 		gridLayout = append(gridLayout, item)
 
 		if y+((itemheight*2)+padding) >= height {
@@ -160,6 +165,50 @@ func CircleProgressbar(progress, radius, strokewidth, posX, posY int, color stri
 		radius, strokewidth, radius, strings.Join(class, " "), posX, posY, radius, color, strokewidth, dasharray, dashoffset)
 	return progressbar, GetProgressAnimation(progress, radius)
 }
+
+type PieChartSlice struct {
+	Name    string  `json:"name"`
+	Percent float64 `json:"percent"`
+	Color   string  `json:"color"`
+}
+
+func PieChart(slices []PieChartSlice, radius, posX, posY int, color string) string {
+	var cumulativePercent float64 = 0
+	paths := []string{}
+	for _, slice := range slices {
+		var startX, startY = GetCoordinatesForPercent(cumulativePercent/float64(100), radius)
+		cumulativePercent += slice.Percent
+
+		var endX, endY = GetCoordinatesForPercent(cumulativePercent/float64(100), radius)
+
+		var largeArcFlag = 0
+		if slice.Percent > 50 {
+			largeArcFlag = 1
+		}
+
+		var pathData2 = []string{
+			fmt.Sprintf(`M %v %v`, startX, startY),                                        // Move
+			fmt.Sprintf(`A %v %v 0 %v 1 %v %v`, radius, radius, largeArcFlag, endX, endY), // Arc
+			`L 0 0`, // Line
+		}
+		pathData := strings.Join(pathData2, " ")
+
+		paths = append(paths, fmt.Sprintf(`<path d="%v" fill="%v"></path>`, pathData, slice.Color))
+	}
+	piechart := fmt.Sprintf(`
+	<g transform="translate(%v,%v)">
+		<circle cx="0" cy="0" r="%v" fill="%v" class="circle" stroke="#333333" stroke-width="5"/>
+		<g class="circle" transform="translate(0,0)">
+		%v
+		</g>
+	</g>`, posX, posY, radius, color, strings.Join(paths, "\n"))
+	return piechart
+}
+func GetCoordinatesForPercent(percent float64, radius int) (float64, float64) {
+	var x = math.Cos(float64(2) * math.Pi * percent)
+	var y = math.Sin(float64(2) * math.Pi * percent)
+	return ToFixed(x*float64(radius), 8), ToFixed(y*float64(radius), 8)
+}
 func GetProgressAnimation(progress, radius int) string {
 	dasharray := (2 * math.Pi * float64(radius))
 
@@ -180,7 +229,6 @@ func GetProgressAnimation(progress, radius int) string {
 		}
 	}`
 }
-
 func GenerateCard(style style.Styles, defs []string, body []string, width, height int, customStyles ...string) []string {
 	var card Card
 	card.Style = style

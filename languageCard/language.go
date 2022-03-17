@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -39,8 +41,15 @@ type Languages struct {
 	Color string `json:"color"`
 }
 
-func LanguageCard(title, user string, cardstyle style.Styles) string {
-
+func LanguageCard(title, user, langs_count string, cardstyle style.Styles) string {
+	lang_count, _ := strconv.Atoi(langs_count)
+	if len(langs_count) <= 0 {
+		lang_count = 10
+	}
+	type kv struct {
+		Key   string
+		Value Languages
+	}
 	jsonData := map[string]string{
 		"query": fmt.Sprintf(`
 		{
@@ -62,6 +71,88 @@ func LanguageCard(title, user string, cardstyle style.Styles) string {
 		  }
 		}
 		`, user),
+
+		/*
+
+					{
+			  viewer {
+			    login
+			    name
+			    repositories(first: 100, isFork: false) {
+			      pageInfo {
+			        endCursor
+			      }
+			      nodes {
+			        nameWithOwner
+			        stargazers {
+			          totalCount
+			        }
+			        forkCount
+			        languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+			          edges {
+			            size
+			            node {
+			              name
+			              color
+			            }
+			          }
+			        }
+			      }
+			    }
+			    repositoriesContributedTo(
+			      first: 100
+			      includeUserRepositories: false
+			      contributionTypes: [COMMIT]
+			    ) {
+			      edges {
+			        node {
+			          id
+			          name
+			        }
+			      }
+			      pageInfo {
+			        hasNextPage
+			      }
+			      nodes {
+			        nameWithOwner
+			        stargazers {
+			          totalCount
+			        }
+			        forkCount
+			        languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+			          edges {
+			            size
+			            node {
+			              name
+			              color
+			            }
+			          }
+			        }
+			      }
+			    }
+			    company
+			    companyHTML
+			    projects(first: 10) {
+			      edges {
+			        node {
+			          id
+			          name
+			          progress {
+			            doneCount
+			            donePercentage
+			            inProgressCount
+			            inProgressPercentage
+			            todoCount
+			            todoPercentage
+			          }
+			          state
+			          body
+			        }
+			      }
+			    }
+			  }
+			}
+		*/
 	}
 
 	jsonValue, _ := json.Marshal(jsonData)
@@ -77,19 +168,25 @@ func LanguageCard(title, user string, cardstyle style.Styles) string {
 		fmt.Printf("Request Failed. Error: %v", err)
 	}
 	defer response.Body.Close()
-	responseData, _ := ioutil.ReadAll(response.Body)
-
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
 	var data Data
 	json.Unmarshal(responseData, &data)
 
-	sum := func(values map[string]Languages) int {
+	sum := func(values []kv) int {
 		var sum int
 		for _, l := range values {
-			sum += l.Size
+			sum += l.Value.Size
 		}
 		return sum
 	}
-	customstyles := []string{}
+	customstyles := []string{
+		`.circle {
+			transform: rotate(-90deg);
+		}`,
+	}
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
 		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
@@ -97,16 +194,12 @@ func LanguageCard(title, user string, cardstyle style.Styles) string {
 
 	padding := 30
 	body := []string{
-		fmt.Sprintf(`<g id="Box"><rect x="0" y="0" rx="15" fill="%v" width="%v" height="%v" /></g>`, cardstyle.Background, 700, 200),
+		fmt.Sprintf(`<g id="Box"><rect x="0" y="0" rx="15" fill="%v" width="%v" height="%v" /></g>`, cardstyle.Background, 800, 300),
 		`<g data-testid="card-text">`,
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v</text>`, padding, padding, card.ToTitleCase(title)),
 		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, padding),
 		`</g>`,
 	}
-
-	// gridX := 30
-	// gridY := 100
-	// gridYstartPos := 100
 
 	languages := map[string]Languages{}
 	for _, v := range data.Data.User.Repositories.Nodes {
@@ -120,17 +213,34 @@ func LanguageCard(title, user string, cardstyle style.Styles) string {
 			}
 		}
 	}
-	content := []string{}
-	for name, l := range languages {
-		content = append(content, fmt.Sprintf(`
-		<g height="80" x="" y="">
-			<circle cx="5" cy="6" r="5" fill="" />
-			<text data-testid="lang-name" x="15" y="10" class='lang-name'>%v - %v</text>
-    	</g>`, name, card.CalculatePercentFloat(l.Size, sum(languages))),
-		)
-		fmt.Printf("%v | Percent %v%v\n", name, card.CalculatePercentFloat(l.Size, sum(languages)), "%")
-	}
-	body = append(body, card.VerticalFlexBox(300, 20, 20, padding, content))
 
+	/* Sort Languages */
+
+	var ss []kv
+	for k, v := range languages {
+		ss = append(ss, kv{k, v})
+	}
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value.Size > ss[j].Value.Size
+	})
+	if len(ss) > lang_count {
+		ss = ss[0:lang_count]
+	}
+
+	content := []string{}
+	slices := []card.PieChartSlice{}
+	for _, l := range ss {
+		content = append(content, fmt.Sprintf(`
+		<g transform="translate(0,0)">
+			<circle cx="5" cy="6" r="5" fill="%v" />
+			<text width="130" x="15" y="10" class='lang-name'>%v - %v%v</text>
+		</g>`, l.Value.Color, l.Key, card.CalculatePercentFloat(l.Value.Size, sum(ss)), "%"))
+
+		// Create Slice for piechart
+		var slice = card.PieChartSlice{Name: l.Key, Percent: float64(card.CalculatePercentFloat(l.Value.Size, sum(ss))), Color: l.Value.Color}
+		slices = append(slices, slice)
+	}
+	body = append(body, card.VerticalFlexBox(270, 20, 30, padding, content))
+	body = append(body, card.PieChart(slices, 60, 400, 150, "#ff0000"))
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, 800, 300, customstyles...), "\n")
 }

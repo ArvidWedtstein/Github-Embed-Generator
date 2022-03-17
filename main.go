@@ -22,7 +22,7 @@ import (
 func main() {
 	router := gin.Default()
 	router.StaticFS("/static", http.Dir("./static"))
-	router.StaticFile("/", ".env")
+	router.StaticFile("/.env", "/.env")
 	router.GET("/ranklist", rankList)
 	router.GET("/skills", getSkills)
 	router.GET("/mostactivity", getMostactivity)
@@ -37,8 +37,8 @@ func main() {
 		panic("Error loading .env file")
 	}
 
-	router.Run("localhost:8080")
-	// router.Run()
+	// router.Run("localhost:8080")
+	router.Run()
 }
 
 func getMostactivity(c *gin.Context) {
@@ -107,8 +107,9 @@ func language(c *gin.Context) {
 	color = style.CheckHex(styles)
 	title := c.Request.FormValue("title")
 	user := c.Request.FormValue("user")
+	langs_count := c.Request.FormValue("langs_count")
 
-	c.String(http.StatusOK, languageCard.LanguageCard(title, user, color))
+	c.String(http.StatusOK, languageCard.LanguageCard(title, user, langs_count, color))
 }
 func rankList(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")

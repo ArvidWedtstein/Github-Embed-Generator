@@ -11,12 +11,6 @@ import (
 	"strings"
 )
 
-type Card struct {
-	Title     string   `json:"title"`
-	Languages []string `json:"languages"`
-	Colors    []string `json:"colors"`
-	Body      []string `json:"body"`
-}
 type User struct {
 	Avatar string
 	Score  int

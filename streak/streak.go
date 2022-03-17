@@ -79,6 +79,32 @@ func Streak(user, hide_title string, cardstyle style.Styles) string {
 	currentDate := time.Now()
 	year := currentDate.Year()
 	url := fmt.Sprintf("https://skyline.github.com/%v/%v.json", user, year)
+	/*
+		query {
+		  viewer {
+		    contributionsCollection(
+		        from: "2021-03-01T00:00:00Z",
+		        to: "2022-03-01T00:00:00Z"
+		    ) {
+		      contributionCalendar {
+		        totalContributions
+		        colors
+		        weeks {
+		          firstDay
+		          contributionDays {
+		            date
+		            weekday
+		            contributionCount
+		            contributionLevel
+		            color
+		          }
+		        }
+		      }
+		  }
+		  }
+		}
+
+	*/
 	recoverFromError := func() {
 		if r := recover(); r != nil {
 			fmt.Println("recovered from ", r)

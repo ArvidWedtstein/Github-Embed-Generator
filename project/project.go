@@ -131,13 +131,8 @@ func Project(user, project string, cardstyle style.Styles) string {
 	goal := 1000
 
 	apiurl := "https://api.github.com/repos/" + user + "/" + project + "/stats/contributors"
-	apiurlfiles := "https://api.github.com/search/code?q=user:" + user + "+repo:" + user + "/" + project
 
 	reqAPI, err := http.NewRequest("GET", apiurl, nil)
-	if err != nil {
-		panic(err.Error())
-	}
-	reqAPIfiles, err := http.NewRequest("GET", apiurlfiles, nil)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -150,18 +145,7 @@ func Project(user, project string, cardstyle style.Styles) string {
 	}
 	defer responseAPI.Body.Close()
 
-	responseAPIfiles, err := clientAPI.Do(reqAPIfiles)
-	defer recoverFromError()
-	if err != nil {
-		panic(err.Error())
-	}
-	defer responseAPIfiles.Body.Close()
-
 	responseDataAPI, err := ioutil.ReadAll(responseAPI.Body)
-	if err != nil {
-		panic(err)
-	}
-	responseDataAPIfiles, err := ioutil.ReadAll(responseAPIfiles.Body)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +153,7 @@ func Project(user, project string, cardstyle style.Styles) string {
 	var resObjectAPI ProjectActivity
 	json.Unmarshal(responseDataAPI, &resObjectAPI)
 
-	var resObjectAPIfiles Files
-	json.Unmarshal(responseDataAPIfiles, &resObjectAPIfiles)
-
-	i, err := strconv.ParseInt(strconv.Itoa(resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Week), 10, 64)
-	defer recoverFromError()
-	if err != nil {
-		panic(err)
-	}
+	i, _ := strconv.ParseInt(strconv.Itoa(resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Week), 10, 64)
 	tm := time.Unix(i, 0)
 	_, week := tm.ISOWeek()
 
@@ -232,7 +209,6 @@ func Project(user, project string, cardstyle style.Styles) string {
 		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
 		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
 		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
-		fmt.Sprintf(`<text x="%v" y="210" id="Files" class="text">Files: %v</text>`, paddingX, resObjectAPIfiles.TotalCount),
 		fmt.Sprintf(`<text x="%v" y="230" id="Week" class="text">Week: %v</text>`, paddingX, week),
 		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(additions, goal), "%"),
 		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(deletions, goal), "%"),
