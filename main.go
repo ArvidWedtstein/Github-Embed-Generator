@@ -34,7 +34,7 @@ func main() {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		panic("Error loading .env file")
+		fmt.Printf("Error loading .env file")
 	}
 
 	// router.Run("localhost:8080")
