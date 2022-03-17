@@ -1,0 +1,26 @@
+[
+    {
+        "name": "light",
+        "title": "#000000",
+        "text": "#000000",
+        "background": "#ffffff",
+        "box": "#333333"
+    },  
+    {
+        "name": "dark",
+        "title": "#ffffff",
+        "text": "#ffffff",
+        "background": "#000000",
+        "box": "#dddddd"
+    },
+    {
+        "name": "rgb",
+        "title": "#ffffff",
+        "text": "#ffffff",
+        "background": "#url(rgb)",
+        "box": "#url(rgb)"
+    },
+    {
+        "name": "lartrags"
+    }
+]
