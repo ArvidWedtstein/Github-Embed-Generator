@@ -200,3 +200,19 @@ func GenerateCard(style style.Styles, defs []string, body []string, width, heigh
 func ToTitleCase(str string) string {
 	return strings.Title(str)
 }
+
+func CalculatePercent(number, total int) int {
+	return int((float64(number) / float64(total)) * float64(100))
+}
+func CalculatePercentFloat(number, total int) float64 {
+	return ToFixed((float64(number)/float64(total))*float64(100), 2)
+}
+
+func round(num float64) int {
+	return int(num + math.Copysign(0.5, num))
+}
+
+func ToFixed(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision))
+	return float64(round(num*output)) / output
+}

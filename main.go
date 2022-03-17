@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"githubembedapi/card/style"
 	"githubembedapi/commit_activity"
+	"githubembedapi/languageCard"
 	"githubembedapi/organization"
 	"githubembedapi/project"
 	"githubembedapi/rank"
@@ -14,11 +15,14 @@ import (
 	"githubembedapi/skills"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	router := gin.Default()
 	router.StaticFS("/static", http.Dir("./static"))
+	router.StaticFile("/", ".env")
 	router.GET("/ranklist", rankList)
 	router.GET("/skills", getSkills)
 	router.GET("/mostactivity", getMostactivity)
@@ -26,9 +30,15 @@ func main() {
 	router.GET("/commitactivity", repositoryCommitActivity)
 	router.GET("/streak", userstreak)
 	router.GET("/resonance", resonance)
+	router.GET("/languageCard", language)
 
-	// router.Run("localhost:8080")
-	router.Run()
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
+	router.Run("localhost:8080")
+	// router.Run()
 }
 
 func getMostactivity(c *gin.Context) {
@@ -83,6 +93,22 @@ func projectcard(c *gin.Context) {
 	repo := c.Request.FormValue("repo")
 	color = style.CheckHex(styles)
 	c.String(http.StatusOK, project.Project(user, repo, color))
+}
+func language(c *gin.Context) {
+	c.Header("Content-Type", "image/svg+xml")
+	var color style.Styles
+	styles := map[string]string{
+		"Title":      c.Request.FormValue("titlecolor"),
+		"Border":     c.Request.FormValue("bordercolor"),
+		"Background": c.Request.FormValue("backgroundcolor"),
+		"Text":       c.Request.FormValue("textcolor"),
+		"Box":        c.Request.FormValue("boxcolor"),
+	}
+	color = style.CheckHex(styles)
+	title := c.Request.FormValue("title")
+	user := c.Request.FormValue("user")
+
+	c.String(http.StatusOK, languageCard.LanguageCard(title, user, color))
 }
 func rankList(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")

@@ -183,12 +183,6 @@ func Project(user, project string, cardstyle style.Styles) string {
 	additions := resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Additions
 	deletions := resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Deletions
 	commits := resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Commits
-	calculatePercent := func(number, total int) int {
-		return int((float64(number) / float64(total)) * float64(100))
-	}
-	fmt.Println(additions)
-	fmt.Println(deletions)
-	fmt.Println(commits)
 
 	customstyles := []string{
 		`.circle {
@@ -211,9 +205,9 @@ func Project(user, project string, cardstyle style.Styles) string {
 	paddingX := 30
 	paddingY := 30
 
-	prog1, style1 := card.CircleProgressbar(calculatePercent(additions, goal), 80, 10, 0, 0, "#39d353", "circle")
-	prog2, style2 := card.CircleProgressbar(calculatePercent(deletions, goal), 70, 10, 0, 0, "red", "circle")
-	prog3, style3 := card.CircleProgressbar(calculatePercent(commits, goal), 60, 10, 0, 0, "blue", "circle")
+	prog1, style1 := card.CircleProgressbar(card.CalculatePercent(additions, goal), 80, 10, 0, 0, "#39d353", "circle")
+	prog2, style2 := card.CircleProgressbar(card.CalculatePercent(deletions, goal), 70, 10, 0, 0, "red", "circle")
+	prog3, style3 := card.CircleProgressbar(card.CalculatePercent(commits, goal), 60, 10, 0, 0, "blue", "circle")
 	customstyles = append(customstyles, style1)
 	customstyles = append(customstyles, style2)
 	customstyles = append(customstyles, style3)
@@ -235,14 +229,14 @@ func Project(user, project string, cardstyle style.Styles) string {
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v Stats</text>`, paddingX, paddingY, card.ToTitleCase(project)),
 		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, paddingX),
 		fmt.Sprintf(`<text x="%v" y="130" id="Goal" class="text">Goal: %v</text>`, paddingX, goal),
-		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, calculatePercent(additions, goal), "%"),
-		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, calculatePercent(deletions, goal), "%"),
+		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
+		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
 		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
 		fmt.Sprintf(`<text x="%v" y="210" id="Files" class="text">Files: %v</text>`, paddingX, resObjectAPIfiles.TotalCount),
 		fmt.Sprintf(`<text x="%v" y="230" id="Week" class="text">Week: %v</text>`, paddingX, week),
-		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, calculatePercent(additions, goal), "%"),
-		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, calculatePercent(deletions, goal), "%"),
-		fmt.Sprintf(`<text x="440" y="170" id="Deletions" class="text">Com: %v%v</text>`, calculatePercent(commits, goal), "%"),
+		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(additions, goal), "%"),
+		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(deletions, goal), "%"),
+		fmt.Sprintf(`<text x="440" y="170" id="Deletions" class="text">Com: %v%v</text>`, card.CalculatePercent(commits, goal), "%"),
 		`</g>`,
 	}
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 300, customstyles...), "\n")

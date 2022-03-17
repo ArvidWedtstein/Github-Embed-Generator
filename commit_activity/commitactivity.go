@@ -47,14 +47,6 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 	var resObjectAPI RepoActivity
 	json.Unmarshal(responseDataAPI, &resObjectAPI)
 
-	// Calendar calculation
-	// start := time.Date(time.Now().Year(), 1, 1, 0, 0, 0, 0, time.UTC)
-	// end := time.Date(time.Now().Year(), 12, 31, 0, 0, 0, 0, time.UTC)
-
-	// calculate total number of days
-	// duration := end.Sub(start)
-	// daysOfYear := int(duration.Hours() / 24)
-
 	customstyles := []string{
 		`.circle {
 		transform: rotate(-90deg);
