@@ -7,6 +7,7 @@ import (
 	"githubembedapi/card/style"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -129,64 +130,20 @@ type Activity []struct {
 	Week  int   `json:"week"`
 	Days  []int `json:"days"`
 }
-type Author struct {
-	Login      string `json:"login"`
-	Avatar_Url string `json:"avatar_url"`
-}
 
-type OrgCard struct {
-	Title        string       `json:"title"`
-	Organization string       `json:"score"`
-	Styles       style.Styles `json:"styles"`
-	Body         []string     `json:"body"`
-}
-
-type Res struct {
-	GITHUB string
-}
-
-func MostactivityCard(title, org string, cardstyle style.Styles, github_token string) string {
+func MostactivityCard(title, org string, cardstyle style.Styles) string {
 	apiurl := "https://api.github.com/orgs/" + org + "/repos"
 	// Create a new request using http
-	reqAPI, err := http.NewRequest("GET", apiurl, nil)
+	req, err := http.NewRequest("GET", apiurl, nil)
 
 	// add authorization header to the req
-	reqAPI.Header.Set("Accept", "application/vnd.heroku+json; version=3")
-	reqAPI.Header.Set("Authorization", "Bearer ")
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("GITHUB_TOKEN"))
 	if err != nil {
 		panic(err.Error())
 	}
 	clientAPI := &http.Client{}
 
-	responseAPI, err := clientAPI.Do(reqAPI)
-
-	if err != nil {
-		panic(err.Error())
-	}
-	defer responseAPI.Body.Close()
-
-	responseDataAPI, err := ioutil.ReadAll(responseAPI.Body)
-
-	if err != nil {
-		panic(err)
-	}
-
-	var responseObjectAPI Res
-	json.Unmarshal(responseDataAPI, &responseObjectAPI)
-	github_token = responseObjectAPI.GITHUB
-
-	userurl := "https://api.github.com/orgs/" + org + "/repos"
-	// Create a new request using http
-	req, err := http.NewRequest("GET", userurl, nil)
-
-	// add authorization header to the req
-	req.Header.Set("Authorization", "Token "+github_token)
-	if err != nil {
-		panic(err.Error())
-	}
-	client := &http.Client{}
-
-	response, err := client.Do(req)
+	response, err := clientAPI.Do(req)
 
 	if err != nil {
 		panic(err.Error())
@@ -274,6 +231,7 @@ func MostactivityCard(title, org string, cardstyle style.Styles, github_token st
 	bodyAdd(`<g>`)
 	for i, r := range responseObject {
 		response2, err := http.Get("https://api.github.com/repos/" + org + "/" + r.Name + "/stats/commit_activity")
+		response2.Header.Set("Authorization", "Bearer "+os.Getenv("GITHUB_TOKEN"))
 		if err != nil {
 			panic(err.Error())
 		}

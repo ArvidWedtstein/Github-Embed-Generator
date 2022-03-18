@@ -92,6 +92,7 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 		gridY = gridYstartPos
 	}
 	grid := []string{`<g data-testid="card-grid">`}
+
 	for _, data := range resObjectAPI {
 		tm := time.Unix(int64(data.Week), 0)
 		_, week := tm.ISOWeek()
@@ -126,6 +127,5 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 	grid = append(grid, `</g>`)
 	body = append(body, fmt.Sprintf(`<text style="font-family: Helvetica" x="30" y="70" class="text">Total commits past year: %v</text>`, totalCommits))
 	body = append(body, strings.Join(grid, "\n"))
-	// return strings.Join(card.GenerateCard(cardstyle, defs, body, gridX+(paddingX*2), 200, customstyles...), "\n")
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, 800, 200, customstyles...), "\n")
 }

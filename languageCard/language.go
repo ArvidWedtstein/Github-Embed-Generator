@@ -71,88 +71,6 @@ func LanguageCard(title, user, langs_count string, cardstyle style.Styles) strin
 		  }
 		}
 		`, user),
-
-		/*
-
-					{
-			  viewer {
-			    login
-			    name
-			    repositories(first: 100, isFork: false) {
-			      pageInfo {
-			        endCursor
-			      }
-			      nodes {
-			        nameWithOwner
-			        stargazers {
-			          totalCount
-			        }
-			        forkCount
-			        languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
-			          edges {
-			            size
-			            node {
-			              name
-			              color
-			            }
-			          }
-			        }
-			      }
-			    }
-			    repositoriesContributedTo(
-			      first: 100
-			      includeUserRepositories: false
-			      contributionTypes: [COMMIT]
-			    ) {
-			      edges {
-			        node {
-			          id
-			          name
-			        }
-			      }
-			      pageInfo {
-			        hasNextPage
-			      }
-			      nodes {
-			        nameWithOwner
-			        stargazers {
-			          totalCount
-			        }
-			        forkCount
-			        languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
-			          edges {
-			            size
-			            node {
-			              name
-			              color
-			            }
-			          }
-			        }
-			      }
-			    }
-			    company
-			    companyHTML
-			    projects(first: 10) {
-			      edges {
-			        node {
-			          id
-			          name
-			          progress {
-			            doneCount
-			            donePercentage
-			            inProgressCount
-			            inProgressPercentage
-			            todoCount
-			            todoPercentage
-			          }
-			          state
-			          body
-			        }
-			      }
-			    }
-			  }
-			}
-		*/
 	}
 
 	jsonValue, _ := json.Marshal(jsonData)
@@ -190,6 +108,10 @@ func LanguageCard(title, user, langs_count string, cardstyle style.Styles) strin
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
 		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+	}
+
+	if len(title) <= 0 {
+		title = "Languages"
 	}
 
 	padding := 30

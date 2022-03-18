@@ -2,24 +2,4 @@
 
 
 
-query: ` 
-       query userInfo($login: String!) { 
-         user(login: $login) { 
-           repositories(isFork: false, first: 100) { 
-             nodes { 
-               languages(first: 1) { 
-                 edges { 
-                   size 
-                   node { 
-                     color 
-                     name 
-                   } 
-                 } 
-               } 
-             } 
-           } 
-           
-      QUERY for getting most used languages
-
-
 https://github.com/graphql-go/graphql

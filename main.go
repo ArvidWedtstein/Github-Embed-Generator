@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"githubembedapi/commit_activity"
 	"githubembedapi/languageCard"
 	"githubembedapi/organization"
@@ -56,9 +57,7 @@ func getMostactivity(c *gin.Context) {
 	org := c.Request.FormValue("org")
 	title := c.Request.FormValue("title")
 
-	github_token := ""
-
-	c.String(http.StatusOK, organization.MostactivityCard(title, org, color, github_token))
+	c.String(http.StatusOK, organization.MostactivityCard(title, org, color))
 }
 func repositoryCommitActivity(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
@@ -108,7 +107,18 @@ func language(c *gin.Context) {
 	title := c.Request.FormValue("title")
 	user := c.Request.FormValue("user")
 	langs_count := c.Request.FormValue("langs_count")
+	theme := c.Request.FormValue("theme")
 
+	if len(theme) > 0 {
+		selectedTheme := themes.LoadTheme(theme)
+		color = style.Styles{
+			Background: selectedTheme.Background,
+			Text:       selectedTheme.Text,
+			Title:      selectedTheme.Title,
+			Border:     selectedTheme.Border,
+			Box:        selectedTheme.Box,
+		}
+	}
 	c.String(http.StatusOK, languageCard.LanguageCard(title, user, langs_count, color))
 }
 func rankList(c *gin.Context) {

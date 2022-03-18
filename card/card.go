@@ -18,7 +18,7 @@ func (card Card) GetStyles(customStyles ...string) string {
 	var style = []string{
 		`<style>`,
 		`.title { font: 25px sans-serif; fill: ` + card.Style.Title + `}`,
-		`.text { font: 20px sans-serif; fill: ` + card.Style.Text + `; font-family: ` + card.Style.Textfont + `;}`,
+		`.text { font: 16px sans-serif; fill: ` + card.Style.Text + `; font-family: ` + card.Style.Textfont + `;}`,
 	}
 	if cap(customStyles) > 0 {
 		style = append(style, customStyles...)

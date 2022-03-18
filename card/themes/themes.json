@@ -1,26 +1,34 @@
 [
-    {
-        "name": "light",
-        "title": "#000000",
-        "text": "#000000",
-        "background": "#ffffff",
-        "box": "#333333"
-    },  
-    {
-        "name": "dark",
-        "title": "#ffffff",
-        "text": "#ffffff",
-        "background": "#000000",
-        "box": "#dddddd"
-    },
-    {
-        "name": "rgb",
-        "title": "#ffffff",
-        "text": "#ffffff",
-        "background": "#url(rgb)",
-        "box": "#url(rgb)"
-    },
-    {
-        "name": "lartrags"
-    }
+  {
+    "name": "light",
+    "title": "#000000",
+    "text": "#000000",
+    "background": "#ffffff",
+    "border": "#333333",
+    "box": "#333333",
+    "font": "Helvetica"
+  },  
+  {
+    "name": "dark",
+    "title": "#ffffff",
+    "text": "#ffffff",
+    "background": "#000000",
+    "border": "#dddddd",
+    "box": "#dddddd",
+    "font": "Helvetica"
+  },
+  {
+    "name": "rgb",
+    "title": "#ffffff",
+    "text": "#ffffff",
+    "background": "#url(rgb)",
+    "border": "#333333",
+    "box": "#url(rgb)",
+    "font": "Helvetica"
+  },
+  {
+    "name": "lartrags",
+    "border": "#333333",
+    "font": "Helvetica"
+  }
 ]

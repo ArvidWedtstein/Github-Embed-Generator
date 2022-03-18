@@ -1,12 +1,14 @@
 package streak
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -29,10 +31,171 @@ type Commits struct {
 	} `json:"contributions"`
 }
 
+type StreakData struct {
+	Data struct {
+		User struct {
+			ContributionsCollection struct {
+				ContributionCalendar struct {
+					TotalContributions int `json:"totalContributions"`
+					Weeks              []struct {
+						FirstDay         string `json:"firstDay"`
+						ContributionDays []struct {
+							Color             string `json:"color"`
+							ContributionCount int    `json:"contributionCount"`
+							ContributionLevel string `json:"contributionLevel"`
+							Date              string `json:"date"`
+							Weekday           int    `json:"weekday"`
+						} `json:"contributionDays"`
+					} `json:"weeks"`
+				} `json:"contributionCalendar"`
+			} `json:"contributionsCollection"`
+		} `json:"user"`
+	} `json:"data"`
+}
+
 func Streak(user, hide_title string, cardstyle style.Styles) string {
+
+	year := time.Now().Year()
+	jsonData := map[string]string{
+		"query": fmt.Sprintf(`
+		{
+			user(login: "%v") {
+                contributionsCollection(from: "%v-01-01T00:00:00Z", to: "%v-12-31T23:59:59Z") {
+                    contributionCalendar {
+                        totalContributions
+                        weeks {
+                            contributionDays {
+                            contributionCount
+                            date
+                            }
+                        }
+                    }
+                }
+            }
+		}
+		`, user, year, year),
+	}
+
+	jsonValue, _ := json.Marshal(jsonData)
+
+	request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("GITHUB_TOKEN")))
+	if err != nil {
+		panic(fmt.Sprintf("Request Failed. Error: %v", err))
+	}
+	client := &http.Client{Timeout: time.Second * 10}
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Printf("Request Failed. Error: %v", err)
+	}
+	defer response.Body.Close()
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+	var data StreakData
+	json.Unmarshal(responseData, &data)
+
+	type Contribution struct {
+		Date          time.Time
+		Contributions int
+	}
+	type StreakC struct {
+		Start  time.Time
+		End    time.Time
+		Length int
+	}
+	type Stats struct {
+		TotalContributions int
+		FirstContribution  string
+		LongestStreak      StreakC
+		CurrentStreak      StreakC
+	}
+
+	getContributionDates := func() []Contribution {
+
+		var contributions []Contribution
+		today := time.Now()
+		tomorrow := today.AddDate(0, 0, 1)
+
+		for _, week := range data.Data.User.ContributionsCollection.ContributionCalendar.Weeks {
+			for _, day := range week.ContributionDays {
+				date, err := time.Parse("2006-01-02", day.Date)
+				if err != nil {
+					panic(err.Error())
+				}
+				count := day.ContributionCount
+
+				// count contributions until current date
+				// also count next day if user contributed already
+				if (date.Before(tomorrow) || date == today) || (date == tomorrow && count > 0) {
+					contributions = append(contributions, Contribution{Date: date, Contributions: count})
+				}
+			}
+		}
+		return contributions
+	}
+
+	getContributionStats := func(contributions []Contribution) Stats {
+		if len(contributions) <= 0 {
+			panic("No contributions exist")
+		}
+
+		today := contributions[len(contributions)-1]
+		first := contributions[0].Date
+		stats := Stats{
+			TotalContributions: 0,
+			FirstContribution:  "",
+			LongestStreak: StreakC{
+				Start:  first,
+				End:    first,
+				Length: 0,
+			},
+			CurrentStreak: StreakC{
+				Start:  first,
+				End:    first,
+				Length: 0,
+			},
+		}
+
+		for _, date := range contributions {
+			stats.TotalContributions += date.Contributions
+
+			if date.Contributions > 0 {
+				stats.CurrentStreak.Length++
+				stats.CurrentStreak.End = date.Date
+
+				if stats.CurrentStreak.Length == 1 {
+					stats.CurrentStreak.Start = date.Date
+				}
+
+				if stats.FirstContribution == "" {
+					stats.FirstContribution = date.Date.Format("2006-01-02")
+				}
+
+				if stats.CurrentStreak.Length > stats.LongestStreak.Length {
+					stats.LongestStreak.Start = stats.CurrentStreak.Start
+					stats.LongestStreak.End = stats.CurrentStreak.End
+					stats.LongestStreak.Length = stats.CurrentStreak.Length
+				}
+			} else if date.Date != today.Date {
+
+				// reset streak
+				stats.CurrentStreak.Length = 0
+				stats.CurrentStreak.Start = today.Date
+				stats.CurrentStreak.End = today.Date
+			}
+		}
+		return stats
+	}
+	// get stats
+	contributions := getContributionDates()
+	stats := getContributionStats(contributions)
+
 	height := 200
 	width := 400
 	strokewidth := 8
+
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
 		`.streakcircle {`,
@@ -45,14 +208,17 @@ func Streak(user, hide_title string, cardstyle style.Styles) string {
 			stroke: ` + cardstyle.Border + `;
 			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
 		}`,
-		`.streaktxt {
+		fmt.Sprintf(`.streaktxt {
 			font-size: 40px;
 			font-family: Helvetica;
 			font-weight: 600;
-			fill: ` + cardstyle.Text + `;
-		}`,
+			fill: %v;
+		}`, cardstyle.Text),
 		`.mediantxt {
 			font-size: 24px;	
+		}`,
+		`.datetxt {
+			font-size: 10px;
 		}`,
 		`.titletxt { font-size: 16px;}`,
 	}
@@ -76,101 +242,25 @@ func Streak(user, hide_title string, cardstyle style.Styles) string {
 	if !hideTitle {
 		bodyAdd(fmt.Sprintf(`<text x="%v" y="35" text-anchor="middle" class="title">%s</text>`, (width / 2), card.ToTitleCase("Streak")))
 	}
-	currentDate := time.Now()
-	year := currentDate.Year()
-	url := fmt.Sprintf("https://skyline.github.com/%v/%v.json", user, year)
-	/*
-		query {
-		  viewer {
-		    contributionsCollection(
-		        from: "2021-03-01T00:00:00Z",
-		        to: "2022-03-01T00:00:00Z"
-		    ) {
-		      contributionCalendar {
-		        totalContributions
-		        colors
-		        weeks {
-		          firstDay
-		          contributionDays {
-		            date
-		            weekday
-		            contributionCount
-		            contributionLevel
-		            color
-		          }
-		        }
-		      }
-		  }
-		  }
-		}
+	ctstart := stats.CurrentStreak.Start.Format("Jan 2, 2006")
+	ctend := stats.CurrentStreak.End.Format("Jan 2, 2006")
 
-	*/
-	recoverFromError := func() {
-		if r := recover(); r != nil {
-			fmt.Println("recovered from ", r)
-		}
-	}
-	reqAPI, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		panic(err.Error())
-	}
-	clientAPI := &http.Client{}
-
-	responseAPI, err := clientAPI.Do(reqAPI)
-	defer recoverFromError()
-	if err != nil {
-		panic(err.Error())
-	}
-	defer responseAPI.Body.Close()
-
-	responseDataAPI, err := ioutil.ReadAll(responseAPI.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	var resObjectAPI Commits
-	json.Unmarshal(responseDataAPI, &resObjectAPI)
-
-	_, currentweek := currentDate.ISOWeek()
-	streak := 0
-	var weeks []struct {
-		Week int "json:\"week\""
-		Days []struct {
-			Count int "json:\"count\""
-		} "json:\"days\""
-	}
-	for _, week := range resObjectAPI.Contributions {
-		weeks = append(weeks, week)
-		// Find correct week.
-		if week.Week == currentweek {
-			break
-		}
-	}
-out1:
-	for i := len(weeks) - 1; i >= 0; i-- { // Loop through weeks
-		for b := len(weeks[i].Days) - 1; b >= 0; b-- { // Loop though days
-			if i == len(weeks)-1 && b <= int(currentDate.Weekday()) {
-				if weeks[i].Days[b].Count > 0 {
-					streak++
-				} else if weeks[i].Days[b].Count == 0 {
-					break out1
-				}
-			} else if i != len(weeks)-1 {
-				if weeks[i].Days[b].Count > 0 {
-					streak++
-				} else if weeks[i].Days[b].Count == 0 {
-					break out1
-				}
-			}
-		}
+	if ctend == time.Now().Format("Jan 2, 2006") {
+		ctend = "Today"
 	}
 	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" stroke-width="5" cx="%v" cy="%v" r="50"></circle>`, width/2, height/2))
 	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" stroke-width="%v" filter="url(#wavy) blur(3px)" cx="%v" cy="%v" r="50"></circle>`, strokewidth, width/2, height/2))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="streaktxt">%v</text>`, (width / 2), (height/2)+15, streak))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)+130, (height/2)+5, resObjectAPI.Max))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Highest Commit</text>`, (width/2)+130, (height/2)-30))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)-130, (height/2)+5, resObjectAPI.Median))
-	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Median</text>`, (width/2)-130, (height/2)-30))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="streaktxt">%v</text>`, (width / 2), (height/2)+15, stats.CurrentStreak.Length))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="datetxt text">%v - %v</text>`, (width / 2), (height/2)+70, ctstart, ctend))
+
+	tstart := stats.LongestStreak.Start.Format("Jan 2, 2006")
+	tend := stats.LongestStreak.End.Format("Jan 2, 2006")
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Longest Streak</text>`, (width/2)+130, (height/2)-30))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)+130, (height/2)+5, stats.LongestStreak.Length))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="datetxt text">%v - %v</text>`, (width/2)+130, (height/2)+20, tstart, tend))
+
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Total Contributions</text>`, (width/2)-120, (height/2)-30))
+	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)-130, (height/2)+5, stats.TotalContributions))
 
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, customstyles...), "\n")
 }
