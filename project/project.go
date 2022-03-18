@@ -1,12 +1,14 @@
 package project
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -41,85 +43,26 @@ type ProjectActivity []struct {
 		SiteAdmin         bool   `json:"site_admin"`
 	} `json:"author"`
 }
-type Files struct {
-	TotalCount        int  `json:"total_count"`
-	IncompleteResults bool `json:"incomplete_results"`
-	Items             []struct {
-		Name       string `json:"name"`
-		Path       string `json:"path"`
-		Sha        string `json:"sha"`
-		URL        string `json:"url"`
-		GitURL     string `json:"git_url"`
-		HTMLURL    string `json:"html_url"`
+type CommitHistory struct {
+	Data struct {
 		Repository struct {
-			ID       int    `json:"id"`
-			NodeID   string `json:"node_id"`
-			Name     string `json:"name"`
-			FullName string `json:"full_name"`
-			Private  bool   `json:"private"`
-			Owner    struct {
-				Login             string `json:"login"`
-				ID                int    `json:"id"`
-				NodeID            string `json:"node_id"`
-				AvatarURL         string `json:"avatar_url"`
-				GravatarID        string `json:"gravatar_id"`
-				URL               string `json:"url"`
-				HTMLURL           string `json:"html_url"`
-				FollowersURL      string `json:"followers_url"`
-				FollowingURL      string `json:"following_url"`
-				GistsURL          string `json:"gists_url"`
-				StarredURL        string `json:"starred_url"`
-				SubscriptionsURL  string `json:"subscriptions_url"`
-				OrganizationsURL  string `json:"organizations_url"`
-				ReposURL          string `json:"repos_url"`
-				EventsURL         string `json:"events_url"`
-				ReceivedEventsURL string `json:"received_events_url"`
-				Type              string `json:"type"`
-				SiteAdmin         bool   `json:"site_admin"`
-			} `json:"owner"`
-			HTMLURL          string `json:"html_url"`
-			Description      string `json:"description"`
-			Fork             bool   `json:"fork"`
-			URL              string `json:"url"`
-			ForksURL         string `json:"forks_url"`
-			KeysURL          string `json:"keys_url"`
-			CollaboratorsURL string `json:"collaborators_url"`
-			TeamsURL         string `json:"teams_url"`
-			HooksURL         string `json:"hooks_url"`
-			IssueEventsURL   string `json:"issue_events_url"`
-			EventsURL        string `json:"events_url"`
-			AssigneesURL     string `json:"assignees_url"`
-			BranchesURL      string `json:"branches_url"`
-			TagsURL          string `json:"tags_url"`
-			BlobsURL         string `json:"blobs_url"`
-			GitTagsURL       string `json:"git_tags_url"`
-			GitRefsURL       string `json:"git_refs_url"`
-			TreesURL         string `json:"trees_url"`
-			StatusesURL      string `json:"statuses_url"`
-			LanguagesURL     string `json:"languages_url"`
-			StargazersURL    string `json:"stargazers_url"`
-			ContributorsURL  string `json:"contributors_url"`
-			SubscribersURL   string `json:"subscribers_url"`
-			SubscriptionURL  string `json:"subscription_url"`
-			CommitsURL       string `json:"commits_url"`
-			GitCommitsURL    string `json:"git_commits_url"`
-			CommentsURL      string `json:"comments_url"`
-			IssueCommentURL  string `json:"issue_comment_url"`
-			ContentsURL      string `json:"contents_url"`
-			CompareURL       string `json:"compare_url"`
-			MergesURL        string `json:"merges_url"`
-			ArchiveURL       string `json:"archive_url"`
-			DownloadsURL     string `json:"downloads_url"`
-			IssuesURL        string `json:"issues_url"`
-			PullsURL         string `json:"pulls_url"`
-			MilestonesURL    string `json:"milestones_url"`
-			NotificationsURL string `json:"notifications_url"`
-			LabelsURL        string `json:"labels_url"`
-			ReleasesURL      string `json:"releases_url"`
-			DeploymentsURL   string `json:"deployments_url"`
+			DefaultBranchRef struct {
+				Name   string `json:"name"`
+				Target struct {
+					ID      string `json:"id"`
+					History struct {
+						Nodes []struct {
+							Oid          string `json:"oid"`
+							Message      string `json:"message"`
+							Additions    int    `json:"additions"`
+							Deletions    int    `json:"deletions"`
+							ChangedFiles int    `json:"changedFiles"`
+						} `json:"nodes"`
+					} `json:"history"`
+				} `json:"target"`
+			} `json:"defaultBranchRef"`
 		} `json:"repository"`
-		Score float64 `json:"score"`
-	} `json:"items"`
+	} `json:"data"`
 }
 
 func recoverFromError() {
@@ -132,6 +75,61 @@ func Project(user, project string, cardstyle style.Styles) string {
 
 	apiurl := "https://api.github.com/repos/" + user + "/" + project + "/stats/contributors"
 
+	jsonData := map[string]string{
+		"query": fmt.Sprintf(`
+		{
+			repository(owner: "%v", name: "%v") {
+				defaultBranchRef {
+				  name
+				  target {
+					... on Commit {
+					  id
+					  history(first: 100) {
+						nodes {
+						  oid
+						  message
+						  additions
+						  deletions
+						  changedFiles
+						}
+					  }
+					}
+				  }
+				}
+			  }
+		`, user, project),
+	}
+
+	jsonValue, _ := json.Marshal(jsonData)
+
+	request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("GITHUB_TOKEN")))
+	if err != nil {
+		panic(fmt.Sprintf("Request Failed. Error: %v", err))
+	}
+	client := &http.Client{Timeout: time.Second * 10}
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Printf("Request Failed. Error: %v", err)
+	}
+	defer response.Body.Close()
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+	var data CommitHistory
+	json.Unmarshal(responseData, &data)
+
+	additionsList := []int{}
+	deletionsList := []int{}
+	fileschanged := []int{}
+	for _, v := range data.Data.Repository.DefaultBranchRef.Target.History.Nodes {
+		additionsList = append(additionsList, v.Additions)
+		deletionsList = append(deletionsList, v.Deletions)
+		fileschanged = append(fileschanged, v.ChangedFiles)
+	}
+
+	/* old */
 	reqAPI, err := http.NewRequest("GET", apiurl, nil)
 	if err != nil {
 		panic(err.Error())
@@ -205,10 +203,13 @@ func Project(user, project string, cardstyle style.Styles) string {
 		`<g data-testid="card-text">`,
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v Stats</text>`, paddingX, paddingY, card.ToTitleCase(project)),
 		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, paddingX),
-		fmt.Sprintf(`<text x="%v" y="130" id="Goal" class="text">Goal: %v</text>`, paddingX, goal),
-		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
-		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
-		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
+		fmt.Sprintf(`<text x="%v" y="130" id="Average" class="text">Average: %v</text>`, paddingX, goal),
+		// fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
+		// fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
+		// fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
+		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.Average(additionsList), "%"),
+		fmt.Sprintf(`<text x="%v" y="170" id="FilesChanged" class="text">Files Changed: %v%v🟥</text>`, paddingX, card.Average(fileschanged), "%"),
+		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Deletions: %v%v🟥</text>`, paddingX, card.Average(deletionsList), "%"),
 		fmt.Sprintf(`<text x="%v" y="230" id="Week" class="text">Week: %v</text>`, paddingX, week),
 		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(additions, goal), "%"),
 		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(deletions, goal), "%"),

@@ -264,3 +264,15 @@ func ToFixed(num float64, precision int) float64 {
 	output := math.Pow(10, float64(precision))
 	return float64(round(num*output)) / output
 }
+
+func Sum(list []int) int {
+	total := 0
+	for _, v := range list {
+		total += v
+	}
+	return total
+}
+
+func Average(list []int) int {
+	return Sum(list) / len(list)
+}
