@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"githubembedapi/card"
 	"githubembedapi/card/style"
 	"githubembedapi/card/themes"
 	"githubembedapi/commit_activity"
@@ -9,14 +10,13 @@ import (
 	"githubembedapi/organization"
 	"githubembedapi/project"
 	"githubembedapi/rank"
+	"githubembedapi/skills"
 	"githubembedapi/streak"
 	"net/http"
+	"strconv"
 	"strings"
 
-	"githubembedapi/skills"
-
 	"github.com/gin-gonic/gin"
-
 	"github.com/joho/godotenv"
 )
 
@@ -32,16 +32,30 @@ func main() {
 	router.GET("/streak", userstreak)
 	router.GET("/resonance", resonance)
 	router.GET("/languageCard", language)
+	router.GET("/radar", radar)
 
 	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Printf("Error loading .env file")
 	}
 
-	// router.Run("localhost:8080")
-	router.Run()
+	router.Run("localhost:8080")
+	// router.Run()
 }
-
+func radar(c *gin.Context) {
+	c.Header("Content-Type", "image/svg+xml")
+	var radar card.Radar
+	values := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("values")), ",")
+	for _, v := range values {
+		val, _ := strconv.Atoi(v)
+		radar.Values = append(radar.Values, val)
+	}
+	radar.Name = "test"
+	radar.Color = "#000000"
+	radar.Width = 300
+	radar.Height = 300
+	c.String(http.StatusOK, card.RadarChart(radar))
+}
 func getMostactivity(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 
