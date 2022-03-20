@@ -166,6 +166,48 @@ func CircleProgressbar(progress, radius, strokewidth, posX, posY int, color stri
 	return progressbar, GetProgressAnimation(progress, radius)
 }
 
+// ----------------------------
+// Charts
+// ----------------------------
+
+type Radar struct {
+	Name   string `json:"name"`
+	Values []int  `json:"values"`
+	Color  string `json:"color"`
+	Grid   bool
+	Width  int
+	Height int
+}
+
+func RadarChart(radar Radar) string {
+	radarChart := []string{
+		fmt.Sprintf(`<svg version="1" xmlns="http://www.w3.org/2000/svg" width="%v" height="%v">`, radar.Width, radar.Height),
+		fmt.Sprintf(`<rect width="%v" fill="#ff0000" height="%v" x="0" y="0" />`, radar.Width, radar.Height),
+	}
+
+	pathData := []string{fmt.Sprintf(`M %v %v`, (radar.Width / 2), (radar.Height/2)+radar.Values[0])}
+	for i := 0; i < len(radar.Values); i++ {
+		if i == 0 {
+			pathData = append(pathData, fmt.Sprintf(`L %v %v`, (radar.Width/2)+radar.Values[i+1], (radar.Height/2)))
+		} else if i == 1 {
+			pathData = append(pathData, fmt.Sprintf(`L %v %v`, (radar.Width/2), (radar.Height/2)-radar.Values[i+1]))
+		} else if i == 2 {
+			pathData = append(pathData, fmt.Sprintf(`L %v %v`, (radar.Width/2)-radar.Values[i+1], (radar.Height/2)))
+		} else if i == len(radar.Values)-1 {
+			pathData = append(pathData, fmt.Sprintf(`L %v %v`, (radar.Width/2), (radar.Height/2)+radar.Values[0]))
+		}
+	}
+	radarChart = append(radarChart, fmt.Sprintf(`<path d="%v" fill="%v" stroke="%v" stroke-width="3"/>`, strings.Join(pathData, " "), radar.Color, radar.Color))
+	radarChart = append(radarChart, `</svg>`)
+	return strings.Join(radarChart, " ")
+}
+func BarChart() string {
+	return ``
+}
+func LineChart() string {
+	return ``
+}
+
 type PieChartSlice struct {
 	Name    string  `json:"name"`
 	Percent float64 `json:"percent"`
@@ -243,7 +285,9 @@ func GenerateCard(style style.Styles, defs []string, body []string, width, heigh
 	return card.Body
 }
 
-/* Functional Functions */
+// ----------------------------
+// Functional Functions
+// ----------------------------
 
 func ToTitleCase(str string) string {
 	return strings.Title(str)
@@ -255,16 +299,13 @@ func CalculatePercent(number, total int) int {
 func CalculatePercentFloat(number, total int) float64 {
 	return ToFixed((float64(number)/float64(total))*float64(100), 2)
 }
-
 func round(num float64) int {
 	return int(num + math.Copysign(0.5, num))
 }
-
 func ToFixed(num float64, precision int) float64 {
 	output := math.Pow(10, float64(precision))
 	return float64(round(num*output)) / output
 }
-
 func Sum(list []int) int {
 	total := 0
 	for _, v := range list {
@@ -272,7 +313,20 @@ func Sum(list []int) int {
 	}
 	return total
 }
-
 func Average(list []int) int {
 	return Sum(list) / len(list)
+}
+
+func FindMinAndMax(a []int) (min int, max int) {
+	min = a[0]
+	max = a[0]
+	for _, value := range a {
+		if value < min {
+			min = value
+		}
+		if value > max {
+			max = value
+		}
+	}
+	return min, max
 }
