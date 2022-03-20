@@ -162,7 +162,7 @@ func LanguageCard(title, user, langs_count string, cardstyle style.Styles) strin
 		var slice = card.PieChartSlice{Name: l.Key, Percent: float64(card.CalculatePercentFloat(l.Value.Size, sum(ss))), Color: l.Value.Color}
 		slices = append(slices, slice)
 	}
-	body = append(body, card.VerticalFlexBox(270, 20, 30, padding, content))
+	body = append(body, card.FlexBox(270, 20, 30, padding, content, false))
 	body = append(body, card.PieChart(slices, 60, 400, 150, "#ff0000"))
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, 800, 300, customstyles...), "\n")
 }

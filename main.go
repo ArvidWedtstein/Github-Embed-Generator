@@ -30,9 +30,9 @@ func main() {
 	router.GET("/project", projectcard)
 	router.GET("/commitactivity", repositoryCommitActivity)
 	router.GET("/streak", userstreak)
-	router.GET("/resonance", resonance)
 	router.GET("/languageCard", language)
 	router.GET("/radar", radar)
+	router.GET("/bar", bar)
 
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -46,16 +46,34 @@ func radar(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 	var radar card.Radar
 	values := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("values")), ",")
+	labels := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("labels")), ",")
 	for _, v := range values {
 		val, _ := strconv.Atoi(v)
 		radar.Values = append(radar.Values, val)
 	}
-	radar.Name = "test"
-	radar.Color = "#000000"
+	radar.Labels = labels
+	radar.Color = "#0000ff"
 	radar.Width = 300
 	radar.Height = 300
+	radar.Grid = true
 	c.String(http.StatusOK, card.RadarChart(radar))
 }
+func bar(c *gin.Context) {
+	c.Header("Content-Type", "image/svg+xml")
+	var bar card.Bar
+	values := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("values")), ",")
+	labels := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("labels")), ",")
+	for _, v := range values {
+		val, _ := strconv.Atoi(v)
+		bar.Values = append(bar.Values, val)
+	}
+	bar.Labels = labels
+	bar.Width = 300
+	bar.Height = 300
+	bar.Grid = true
+	c.String(http.StatusOK, card.BarChart(bar))
+}
+
 func getMostactivity(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 
@@ -184,63 +202,4 @@ func getSkills(c *gin.Context) {
 	title := c.Request.FormValue("title")
 
 	c.String(http.StatusOK, skills.Skills(title, languages, color))
-}
-
-func resonance(c *gin.Context) {
-	c.Header("Content-Type", "image/svg+xml")
-	c.String(http.StatusOK, `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" onload="anim()">
-	<style>
-	
-	#lineGroup line {
-	  stroke-width: 1px;
-	}
-	#earth, #sol, #venus {
-		fill: none;
-	}
-	</style>
-	<script>
-	  // <![CDATA[
-	  function anim() {
-	  let earth = document.getElementById('earth')
-	  let venus = document.getElementById('venus')
-	  let lineGroup = document.getElementById('lineGroup')
-	  const earthDeg = 5,
-	earthOrbits = 8,
-	venusOrbits = 13,
-	resonance = earthOrbits / venusOrbits,
-	centre = 250,
-	earthDist = centre - parseInt(earth.getAttribute("cy"), 10),
-	venusDist = centre - parseInt(venus.getAttribute("cy"), 10);
-	let i = 0,
-	orbitals = setInterval(function(){
-	  earth.setAttribute("transform", "rotate("+ i + " " + centre + " " + centre + ")");
-	   venus.setAttribute("transform", "rotate("+ i / resonance + " " + centre + " " + centre + ")");
-	  let earthX = Math.cos((i*Math.PI/180)) * earthDist + centre,
-	  earthY = Math.sin((i*Math.PI/180)) * earthDist + centre;
-	  venusX = Math.cos((i/(earthOrbits/13))*Math.PI/180) * venusDist + centre,
-	  venusY = Math.sin((i/(earthOrbits/13))*Math.PI/180) * venusDist + centre,
-	  resLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-	  resLine.setAttribute('x1', earthX);
-	  resLine.setAttribute('y1', earthY);
-	  resLine.setAttribute('x2', venusX);
-	  resLine.setAttribute('y2', venusY);
-	  resLine.setAttribute('stroke', 'hsla(' + i + ', 50%, 50%, 0.5)');
-	  lineGroup.appendChild(resLine);
-	  i += earthDeg;
-	if (i == (360 * earthOrbits) + earthDeg) {
-	  clearInterval(orbitals);
-	 }
-	}, 60);
-	}
-	anim()
-	// ]]>
-	  </script>
-	  <g id="orbits">
-	  <circle id="venusorbit" cx="250" cy="250" r="120" />
-	  <circle id="earthorbit" cx="250" cy="250" r="165" />
-	</g>
-	  <g id="lineGroup" transform="rotate(-90 250 250)"></g>
-	  <circle id="earth" cx="250" cy="85" r="8" />
-	<circle id="venus" cx="250" cy="130" r="5" />
-	  <circle id="sol" cx="250" cy="250" r="16" /></svg>`)
 }
