@@ -40,8 +40,8 @@ func main() {
 		fmt.Printf("Error loading .env file")
 	}
 
-	router.Run("localhost:8080")
-	// router.Run()
+	// router.Run("localhost:8080")
+	router.Run()
 }
 func radar(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")

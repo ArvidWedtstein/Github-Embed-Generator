@@ -218,7 +218,7 @@ type Bar struct {
 func BarChartVertical(bar Bar) string {
 	_, max := FindMinAndMax(bar.Values)
 	padding := 10
-	width := (len(bar.Values) * 20) + padding*2
+	width := (len(bar.Values) * 20) + padding
 	barChart := []string{
 		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
 			bar.Width, bar.Height, bar.Width, bar.Height),
@@ -241,7 +241,7 @@ func BarChartVertical(bar Bar) string {
 
 			// Generate Lines
 			grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, padding*2, (padding*i)+10, width+padding*4, (padding*i)+10)) // Vertical
-			grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, (padding*i)+padding*3, max+(padding*5), (padding*i)+padding*3, padding))
+			// grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, (padding*i)+padding*3, max+(padding*5), (padding*i)+padding*3, padding)) // Horizontal
 		}
 		BarChartAdd(fmt.Sprintf(`<path d="%v" stroke="#333333" opacity="0.3" stroke-width="1" stroke-linecap="round"/>`,
 			strings.Join(grid, " ")))
@@ -254,7 +254,7 @@ func BarChartVertical(bar Bar) string {
 		content = append(content, fmt.Sprintf(`<g transform="translate(0,0)" class="bar"><rect x="%v" y="%v" width="%v" height="%v" fill="%v"/><text x="%v" y="10" fill="#000000" text-anchor="middle">%v</text></g>`, padding*3, max-(val-padding), 20, val, "#ff0000", val+10, val))
 	}
 	// Generate Row for columns
-	BarChartAdd(FlexBox(bar.Width, 0, max-padding, padding, content, true))
+	BarChartAdd(FlexBox(bar.Width, 0, max-80, padding, content, true))
 
 	BarChartAdd(`</g></svg>`)
 	return strings.Join(barChart, "\n")
@@ -354,6 +354,8 @@ func LineChart(line Line) string {
 			if line.GridHorizontal {
 				grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, width+padding, (padding*i)+10, padding*2, (padding*i)+10))
 			}
+		}
+		for i := 0; i < (width / 10); i++ {
 			if line.GridVertical {
 				grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, (padding*i)+padding*2, max+(padding*4), (padding*i)+padding*2, padding))
 			}
