@@ -57,7 +57,7 @@ func FlexBox(heightWidth, posX, posY, padding int, content []string, horizontal 
 	x := posX
 	y := posY
 	// Make new group
-	gridLayout := []string{fmt.Sprintf(`<g transform="translate(%v,%v)">`, posX, posY)}
+	gridLayout := []string{fmt.Sprintf(`<g data-testid="flexbox" transform="translate(%v,%v)">`, posX, posY)}
 	for _, item := range content {
 		items := strings.Split(item, ` `)
 		var itemwidth int
@@ -197,10 +197,6 @@ func RadarChart(radar Radar) string {
 		x := ToFixed(float64(radar.Values[i])*math.Cos(DegreeToRadians(float64(sectionDegree*(i+1)))), 2)
 		y := ToFixed(float64(radar.Values[i])*math.Sin(DegreeToRadians(float64(sectionDegree*(i+1)))), 2)
 
-		// Move to first position
-		// if i == 0 {
-		// 	pathData = append(pathData, fmt.Sprintf(`M %v %v`, float64(centerX)+x, float64(centerY)+y))
-		// }
 		pathData = append(pathData, fmt.Sprintf(`%v,%v`, float64(centerX)+x, float64(centerY)+y))
 		radarChart = append(radarChart, fmt.Sprintf(`<circle cx="%v" cy="%v" fill="%v" r="3" />`, float64(centerX)+x, float64(centerY)+y, radar.Color))
 	}
@@ -219,25 +215,123 @@ type Bar struct {
 }
 
 func BarChart(bar Bar) string {
+
+	_, max := FindMinAndMax(bar.Values)
+
+	barGap := 10
+	columnHeight := 30
+	totalHeight := (columnHeight + 10) * len(bar.Values)
+
 	barChart := []string{
 		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
-			bar.Width, bar.Height, bar.Width, bar.Height),
+			((max/10)+3)*10, totalHeight+60, ((max/10)+3)*10, totalHeight+60),
 	}
-	// _, max := FindMinAndMax(bar.Values)
-	barGap := 10
-	barChart = append(barChart, fmt.Sprintf(`<path d="M 10 10 L 10 %v" stroke="#333333" stroke-width="3" />`, bar.Height))
+	BarChartAdd := func(content string) {
+		barChart = append(barChart, content)
+	}
+	// ----------------------------
+	// Grid
+	// ----------------------------
+	BarChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
+		barGap, barGap, totalHeight+20, ((max/10)+3)*10))
+	if bar.Grid {
+		for i := 0; i < (max/10)+3; i++ {
+			BarChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" opacity="0.3" stroke-width="3" />`,
+				(barGap*i)+10, totalHeight+20, (barGap*i)+10, barGap))
 
-	content := []string{}
-	for _, v := range bar.Values {
-		fmt.Println(v)
-		content = append(content, `<rect x="" y="" width="30" height="50" fill="#ff0000"/>`)
+			// Lines at bottom
+			BarChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" stroke-width="3" />`,
+				(barGap*i)+10, totalHeight+20, (barGap*i)+10, totalHeight+30))
+
+			// Generate numbers along axis
+			if (i*10)%4 == 0 {
+				BarChartAdd(fmt.Sprintf(`<text style="font-size: 12px" text-anchor="middle" class="text" fill="#333333" x="%v" y="%v">%v</text>`,
+					(barGap*i)+10, totalHeight+40, (i * 10)))
+			}
+		}
 	}
-	barChart = append(barChart, FlexBox(bar.Width, barGap, bar.Height-200, barGap, content, true))
-	barChart = append(barChart, `</g></svg>`)
+	BarChartAdd(`</g>`)
+
+	// ----------------------------
+	// Add Columns
+	// ----------------------------
+	content := []string{}
+	for i, v := range bar.Values {
+		if len(bar.Colors) > i {
+			content = append(content, fmt.Sprintf(`<g transform="translate(0,0)" class="bar"><rect width="%v" height="%v" fill="#%v"/><text x="%v" y="20" fill="#000000" text-anchor="middle">%v</text></g>`, v, columnHeight, bar.Colors[i], v+10, v))
+		} else {
+			content = append(content, fmt.Sprintf(`<g transform="translate(0,0)" class="bar"><rect width="%v" height="%v" fill="%v"/><text x="%v" y="20" fill="#000000" text-anchor="middle">%v</text></g>`, v, columnHeight, "#ff0000", v+10, v))
+		}
+	}
+	// Generate Row for columns
+	BarChartAdd(FlexBox(bar.Height, 5, barGap, barGap, content, false))
+
+	BarChartAdd(`</g></svg>`)
 	return strings.Join(barChart, "\n")
 }
-func LineChart() string {
-	return ``
+
+type Line struct {
+	Values []int `json:"values"`
+	Grid   bool
+	Width  int
+	Height int
+}
+
+func LineChart(line Line) string {
+	_, max := FindMinAndMax(line.Values)
+	width := len(line.Values) * 20
+	padding := 10
+	lineChart := []string{
+		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
+			width+padding, line.Height, width+padding, line.Height),
+	}
+	LineChartAdd := func(content string) {
+		lineChart = append(lineChart, content)
+	}
+
+	// ----------------------------
+	// Grid
+	// ----------------------------
+	LineChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
+		padding, padding, max+(padding*4), width))
+	if line.Grid {
+		for i := 0; i < (max/10)+3; i++ {
+			LineChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" opacity="0.3" stroke-width="1" stroke-linecap="round"/>`,
+				width, (padding*i)+10, padding, (padding*i)+10))
+			// Generate numbers along axis
+			if (i*10)%4 == 0 {
+				LineChartAdd(fmt.Sprintf(`<text style="font-size: 12px" text-anchor="middle" class="text" fill="#333333" x="%v" y="%v">%v</text>`,
+					5, (padding*i)+10, (i * 10)))
+			}
+		}
+		// for i := 0; i < (max/10)+6; i++ {
+		// 	LineChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" opacity="0.3" stroke-width="1" stroke-linecap="round"/>`,
+		// 		(padding*i)+10, line.Height-(padding*2), (padding*i)+10, padding))
+		// 	// Generate numbers along axis
+		// 	if (i*10)%4 == 0 {
+		// 		LineChartAdd(fmt.Sprintf(`<text style="font-size: 12px" text-anchor="middle" class="text" fill="#333333" x="%v" y="%v">%v</text>`,
+		// 			(padding*i)+10, line.Height-5, (i * 10)))
+		// 	}
+		// }
+	}
+	LineChartAdd(`</g>`)
+
+	// ----------------------------
+	// Add Points
+	// ----------------------------
+	polylinePoints := []string{}
+	for i, val := range line.Values {
+		polylinePoints = append(polylinePoints, fmt.Sprintf("%v,%v", (i*20)+padding, max+(padding*3)-(val-10)))
+	}
+	LineChartAdd(fmt.Sprintf(`<polyline
+		fill="none"
+		stroke="#0074d9"
+		stroke-width="3"
+		points="%v" stroke-dasharray="1000"
+		stroke-dashoffset="1000"><animate attributeName="stroke-dashoffset" repeatCount="once" fill="freeze" dur="10s" values="1000;0"/></polyline>`, strings.Join(polylinePoints, " ")))
+
+	LineChartAdd(`</g></svg>`)
+	return strings.Join(lineChart, "\n")
 }
 
 type PieChartSlice struct {

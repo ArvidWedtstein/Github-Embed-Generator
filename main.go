@@ -32,7 +32,7 @@ func main() {
 	router.GET("/streak", userstreak)
 	router.GET("/languageCard", language)
 	router.GET("/radar", radar)
-	router.GET("/bar", bar)
+	router.GET("/line", line)
 
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -58,20 +58,18 @@ func radar(c *gin.Context) {
 	radar.Grid = true
 	c.String(http.StatusOK, card.RadarChart(radar))
 }
-func bar(c *gin.Context) {
+func line(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
-	var bar card.Bar
+	var line card.Line
 	values := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("values")), ",")
-	labels := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("labels")), ",")
 	for _, v := range values {
 		val, _ := strconv.Atoi(v)
-		bar.Values = append(bar.Values, val)
+		line.Values = append(line.Values, val)
 	}
-	bar.Labels = labels
-	bar.Width = 300
-	bar.Height = 300
-	bar.Grid = true
-	c.String(http.StatusOK, card.BarChart(bar))
+	line.Width = 300
+	line.Height = 300
+	line.Grid = true
+	c.String(http.StatusOK, card.LineChart(line))
 }
 
 func getMostactivity(c *gin.Context) {
