@@ -33,6 +33,7 @@ func main() {
 	router.GET("/languageCard", language)
 	router.GET("/radar", radar)
 	router.GET("/line", line)
+	router.GET("/bar", bar)
 
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -68,8 +69,24 @@ func line(c *gin.Context) {
 	}
 	line.Width = 300
 	line.Height = 300
-	line.Grid = true
+	line.Color = "#0074d9"
+	line.GridVertical = true
+	line.GridHorizontal = true
 	c.String(http.StatusOK, card.LineChart(line))
+}
+func bar(c *gin.Context) {
+	c.Header("Content-Type", "image/svg+xml")
+	var bar card.Bar
+	values := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("values")), ",")
+	for _, v := range values {
+		val, _ := strconv.Atoi(v)
+		bar.Values = append(bar.Values, val)
+	}
+	bar.Width = 300
+	bar.Height = 300
+	bar.Grid = true
+	bar.Vertical = true
+	c.String(http.StatusOK, card.BarChartVertical(bar))
 }
 
 func getMostactivity(c *gin.Context) {

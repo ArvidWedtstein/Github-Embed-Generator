@@ -206,12 +206,58 @@ func RadarChart(radar Radar) string {
 }
 
 type Bar struct {
-	Labels []string `json:"labels"`
-	Values []int    `json:"values"`
-	Colors []string `json:"colors"`
-	Grid   bool
-	Width  int
-	Height int
+	Labels   []string `json:"labels"`
+	Values   []int    `json:"values"`
+	Colors   []string `json:"colors"`
+	Grid     bool
+	Vertical bool
+	Width    int
+	Height   int
+}
+
+func BarChartVertical(bar Bar) string {
+	_, max := FindMinAndMax(bar.Values)
+	padding := 10
+	width := (len(bar.Values) * 20) + padding*2
+	barChart := []string{
+		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
+			bar.Width, bar.Height, bar.Width, bar.Height),
+	}
+	BarChartAdd := func(content string) {
+		barChart = append(barChart, content)
+	}
+
+	// Grid
+	BarChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
+		padding*2, padding, max+(padding*5), width+padding*4))
+	if bar.Grid {
+		grid := []string{}
+		for i := 0; i < (max/10)+5; i++ {
+			// Generate numbers along axis
+			if (i*10)%4 == 0 {
+				BarChartAdd(fmt.Sprintf(`<text style="font-size: 12px" text-anchor="middle" class="text" fill="#333333" x="%v" y="%v">%v</text>`,
+					padding, max+(padding*4)-(padding*i), (i * 10)))
+			}
+
+			// Generate Lines
+			grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, padding*2, (padding*i)+10, width+padding*4, (padding*i)+10)) // Vertical
+			grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, (padding*i)+padding*3, max+(padding*5), (padding*i)+padding*3, padding))
+		}
+		BarChartAdd(fmt.Sprintf(`<path d="%v" stroke="#333333" opacity="0.3" stroke-width="1" stroke-linecap="round"/>`,
+			strings.Join(grid, " ")))
+	}
+	BarChartAdd(`</g>`)
+
+	// Add points
+	content := []string{}
+	for _, val := range bar.Values {
+		content = append(content, fmt.Sprintf(`<g transform="translate(0,0)" class="bar"><rect x="%v" y="%v" width="%v" height="%v" fill="%v"/><text x="%v" y="10" fill="#000000" text-anchor="middle">%v</text></g>`, padding*3, max-(val-padding), 20, val, "#ff0000", val+10, val))
+	}
+	// Generate Row for columns
+	BarChartAdd(FlexBox(bar.Width, 0, max-padding, padding, content, true))
+
+	BarChartAdd(`</g></svg>`)
+	return strings.Join(barChart, "\n")
 }
 
 func BarChart(bar Bar) string {
@@ -229,6 +275,7 @@ func BarChart(bar Bar) string {
 	BarChartAdd := func(content string) {
 		barChart = append(barChart, content)
 	}
+
 	// ----------------------------
 	// Grid
 	// ----------------------------
@@ -236,7 +283,7 @@ func BarChart(bar Bar) string {
 		barGap, barGap, totalHeight+20, ((max/10)+3)*10))
 	if bar.Grid {
 		for i := 0; i < (max/10)+3; i++ {
-			BarChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" opacity="0.3" stroke-width="3" />`,
+			BarChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" opacity="0.3" stroke-width="1" />`,
 				(barGap*i)+10, totalHeight+20, (barGap*i)+10, barGap))
 
 			// Lines at bottom
@@ -271,10 +318,12 @@ func BarChart(bar Bar) string {
 }
 
 type Line struct {
-	Values []int `json:"values"`
-	Grid   bool
-	Width  int
-	Height int
+	Values         []int `json:"values"`
+	GridVertical   bool
+	GridHorizontal bool
+	Color          string
+	Width          int
+	Height         int
 }
 
 func LineChart(line Line) string {
@@ -289,46 +338,42 @@ func LineChart(line Line) string {
 		lineChart = append(lineChart, content)
 	}
 
-	// ----------------------------
 	// Grid
-	// ----------------------------
 	LineChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
-		padding, padding, max+(padding*4), width))
-	if line.Grid {
+		padding*2, padding*2, max+(padding*4), width+padding))
+	if line.GridHorizontal || line.GridVertical {
+		grid := []string{}
 		for i := 0; i < (max/10)+3; i++ {
-			LineChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" opacity="0.3" stroke-width="1" stroke-linecap="round"/>`,
-				width, (padding*i)+10, padding, (padding*i)+10))
 			// Generate numbers along axis
 			if (i*10)%4 == 0 {
 				LineChartAdd(fmt.Sprintf(`<text style="font-size: 12px" text-anchor="middle" class="text" fill="#333333" x="%v" y="%v">%v</text>`,
-					5, (padding*i)+10, (i * 10)))
+					padding, max+(padding*4)-(padding*i), (i * 10)))
+			}
+
+			// Generate Lines
+			if line.GridHorizontal {
+				grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, width+padding, (padding*i)+10, padding*2, (padding*i)+10))
+			}
+			if line.GridVertical {
+				grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, (padding*i)+padding*2, max+(padding*4), (padding*i)+padding*2, padding))
 			}
 		}
-		// for i := 0; i < (max/10)+6; i++ {
-		// 	LineChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" opacity="0.3" stroke-width="1" stroke-linecap="round"/>`,
-		// 		(padding*i)+10, line.Height-(padding*2), (padding*i)+10, padding))
-		// 	// Generate numbers along axis
-		// 	if (i*10)%4 == 0 {
-		// 		LineChartAdd(fmt.Sprintf(`<text style="font-size: 12px" text-anchor="middle" class="text" fill="#333333" x="%v" y="%v">%v</text>`,
-		// 			(padding*i)+10, line.Height-5, (i * 10)))
-		// 	}
-		// }
+		LineChartAdd(fmt.Sprintf(`<path d="%v" stroke="#333333" opacity="0.3" stroke-width="1" stroke-linecap="round"/>`,
+			strings.Join(grid, " ")))
 	}
 	LineChartAdd(`</g>`)
 
-	// ----------------------------
-	// Add Points
-	// ----------------------------
+	// Add points
 	polylinePoints := []string{}
 	for i, val := range line.Values {
-		polylinePoints = append(polylinePoints, fmt.Sprintf("%v,%v", (i*20)+padding, max+(padding*3)-(val-10)))
+		polylinePoints = append(polylinePoints, fmt.Sprintf("%v,%v", (i*20)+(padding*2), max+(padding*3)-(val-10)))
 	}
 	LineChartAdd(fmt.Sprintf(`<polyline
 		fill="none"
-		stroke="#0074d9"
+		stroke="%v"
 		stroke-width="3"
 		points="%v" stroke-dasharray="1000"
-		stroke-dashoffset="1000"><animate attributeName="stroke-dashoffset" repeatCount="once" fill="freeze" dur="10s" values="1000;0"/></polyline>`, strings.Join(polylinePoints, " ")))
+		stroke-dashoffset="1000"><animate attributeName="stroke-dashoffset" repeatCount="once" fill="freeze" dur="10s" values="1000;0"/></polyline>`, line.Color, strings.Join(polylinePoints, " ")))
 
 	LineChartAdd(`</g></svg>`)
 	return strings.Join(lineChart, "\n")
