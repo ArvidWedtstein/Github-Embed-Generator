@@ -106,8 +106,8 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 		icon := icons.Icons(lang)
 
 		// Calculate text width somehow.
-		img := fmt.Sprintf(`<g data-testid="icon" transform="translate(%v,%v)">%v<text x="%v" y="%v" text-anchor="middle" class="text">%v</text></g>`,
-			0, 0, icon, boxwidth+(len(lang)*5)-(len(lang)*4), (boxheight/2)+5, card.ToTitleCase(lang))
+		img := fmt.Sprintf(`<g data-testid="icon" transform="translate(%v,%v)">%v<text x="%v" y="%v" alignment-baseline="auto" text-anchor="left" class="text">%v</text></g>`,
+			0, 0, icon, boxwidth+(len(lang))-(len(lang)+20), (boxheight/2)+5, card.ToTitleCase(lang))
 
 		row([]string{
 			fmt.Sprintf(`<rect x="0" y="0" rx="5" class="" width="%v" height="%v" />`, boxwidth+(len(lang)*6), boxheight),
