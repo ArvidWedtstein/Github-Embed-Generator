@@ -40,8 +40,8 @@ func main() {
 		fmt.Printf("Error loading .env file")
 	}
 
-	// router.Run("localhost:8080")
-	router.Run()
+	router.Run("localhost:8080")
+	// router.Run()
 }
 func radar(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
@@ -86,7 +86,7 @@ func bar(c *gin.Context) {
 	bar.Height = 300
 	bar.Grid = true
 	bar.Vertical = true
-	c.String(http.StatusOK, card.BarChartVertical(bar))
+	c.String(http.StatusOK, card.BarChart(bar))
 }
 
 func getMostactivity(c *gin.Context) {

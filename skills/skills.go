@@ -5,7 +5,6 @@ import (
 	"githubembedapi/card"
 	"githubembedapi/card/style"
 	"githubembedapi/icons"
-	"math"
 	"strconv"
 	"strings"
 )
@@ -51,35 +50,34 @@ func Skills(title string, languages []string, cardstyle style.Styles) string {
 	}
 
 	// Algoritm for checking if color is too dark
-	colorToDark := func(color string) bool {
-		var c = strings.Replace(color, "#", "", -1) // strip #
-		rgb, err := strconv.ParseInt(c, 16, 32)     // convert rrggbb to decimal
-		if err != nil {
-			panic(err.Error())
-		}
-		r := (rgb >> 16) & 0xff // extract red
-		g := (rgb >> 8) & 0xff  // extract green
-		b := (rgb >> 0) & 0xff  // extract blue
+	// colorToDark := func(color string) bool {
+	// 	var c = strings.Replace(color, "#", "", -1) // strip #
+	// 	rgb, err := strconv.ParseInt(c, 16, 32)     // convert rrggbb to decimal
+	// 	if err != nil {
+	// 		panic(err.Error())
+	// 	}
+	// 	r := (rgb >> 16) & 0xff // extract red
+	// 	g := (rgb >> 8) & 0xff  // extract green
+	// 	b := (rgb >> 0) & 0xff  // extract blue
 
-		rFloat := 0.2126
-		gFloat := 0.7152
-		bFloat := 0.0722
-		r2Float := float64(r)
-		g2Float := float64(g)
-		b2Float := float64(b)
-		luma := math.Sqrt(rFloat*(r2Float*r2Float) +
-			gFloat*(g2Float*g2Float) +
-			bFloat*(b2Float*b2Float))
+	// 	rFloat := 0.2126
+	// 	gFloat := 0.7152
+	// 	bFloat := 0.0722
+	// 	r2Float := float64(r)
+	// 	g2Float := float64(g)
+	// 	b2Float := float64(b)
+	// 	luma := math.Sqrt(rFloat*(r2Float*r2Float) +
+	// 		gFloat*(g2Float*g2Float) +
+	// 		bFloat*(b2Float*b2Float))
 
-		return luma < 80
-	}
-	fmt.Println(colorToDark("#000000"))
+	// 	return luma < 80
+	// }
 	// Calculate where repositoryboxes should begin
 	posY := titleboxheight + padding
 
 	posX := 0
 
-	imgsize := boxwidth - (padding * 2)
+	// imgsize := boxwidth - (padding * 2)
 	originalpos := posX
 	newwidth := width
 	newheight := height
@@ -101,17 +99,21 @@ func Skills(title string, languages []string, cardstyle style.Styles) string {
 		}
 	}
 
+	// content := []string{}
 	for _, v := range languages {
 
 		icon := icons.Icons(v)
-		img := fmt.Sprintf(`<g x="%v" y="%v" height="%v" width="%v">%v</g>`, boxwidth-imgsize, boxheight-imgsize, imgsize, imgsize, icon)
+		img := fmt.Sprintf(`<g data-testid="icon" transform="translate(%v,%v)">%v<text x="%v" y="%v" text-anchor="middle" class="text">%v</text></g>`,
+			0, 0, icon, boxwidth+(len(v)*8)-(len(v)*5), (boxheight/2)+5, v)
 
 		row([]string{
-			fmt.Sprintf(`<rect x="0" y="0" rx="5" class="" width="%v" height="%v" />`, boxwidth, boxheight),
+			fmt.Sprintf(`<rect x="0" y="0" rx="5" class="" width="%v" height="%v" />`, boxwidth+(len(v)*8), boxheight),
 			img,
 		}, v)
 
-		posX += boxwidth + padding
+		posX += boxwidth + (len(v) * 8) + padding
+
+		// content = append(content, fmt.Sprintf(`<g>`))
 	}
 
 	// adjust the svg size to the content
