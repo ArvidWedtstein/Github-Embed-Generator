@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"githubembedapi/icons"
 	"strconv"
 	"strings"
 )
 
-func Skills(title string, languages []string, cardstyle style.Styles) string {
+func Skills(title string, languages []string, cardstyle themes.Theme) string {
 	if title == "" || len(title) <= 0 {
 		title = "Skills"
 	}
@@ -20,7 +21,7 @@ func Skills(title string, languages []string, cardstyle style.Styles) string {
 	padding := 10
 	strokewidth := 3
 	boxwidth := 60
-	boxheight := 60
+	boxheight := 40
 
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
@@ -37,7 +38,7 @@ func Skills(title string, languages []string, cardstyle style.Styles) string {
 	}
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
-		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
 	}
 
 	body := []string{
@@ -92,26 +93,28 @@ func Skills(title string, languages []string, cardstyle style.Styles) string {
 
 		newheight = posY + boxheight + padding
 		// check if next box will fit into card
-		if posX+boxwidth+(boxwidth+padding) >= width {
+		if posX+(boxwidth+(len(lang)*6))+((boxwidth+(len(lang)*6))+padding) >= width {
 			posY += boxheight + padding
-			newwidth = posX + boxwidth + (padding * 2)
-			posX = originalpos - (boxwidth + padding)
+			newwidth = posX + (boxwidth + (len(lang) * 6)) + (padding * 2)
+			posX = originalpos - ((boxwidth + (len(lang) * 6)) + padding)
 		}
 	}
 
 	// content := []string{}
-	for _, v := range languages {
+	for _, lang := range languages {
 
-		icon := icons.Icons(v)
+		icon := icons.Icons(lang)
+
+		// Calculate text width somehow.
 		img := fmt.Sprintf(`<g data-testid="icon" transform="translate(%v,%v)">%v<text x="%v" y="%v" text-anchor="middle" class="text">%v</text></g>`,
-			0, 0, icon, boxwidth+(len(v)*8)-(len(v)*5), (boxheight/2)+5, v)
+			0, 0, icon, boxwidth+(len(lang)*5)-(len(lang)*4), (boxheight/2)+5, card.ToTitleCase(lang))
 
 		row([]string{
-			fmt.Sprintf(`<rect x="0" y="0" rx="5" class="" width="%v" height="%v" />`, boxwidth+(len(v)*8), boxheight),
+			fmt.Sprintf(`<rect x="0" y="0" rx="5" class="" width="%v" height="%v" />`, boxwidth+(len(lang)*6), boxheight),
 			img,
-		}, v)
+		}, strings.ToUpper(lang))
 
-		posX += boxwidth + (len(v) * 8) + padding
+		posX += (boxwidth + (len(lang) * 6)) + padding
 
 		// content = append(content, fmt.Sprintf(`<g>`))
 	}

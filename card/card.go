@@ -3,6 +3,7 @@ package card
 import (
 	"fmt"
 	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"math"
 	"strconv"
 	"strings"
@@ -10,7 +11,7 @@ import (
 
 type Card struct {
 	Title string       `json:"title"`
-	Style style.Styles `json:"colors"`
+	Style themes.Theme `json:"colors"`
 	Body  []string     `json:"body"`
 }
 
@@ -18,7 +19,7 @@ func (card Card) GetStyles(customStyles ...string) string {
 	var style = []string{
 		`<style>`,
 		`.title { font: 25px sans-serif; fill: ` + card.Style.Title + `}`,
-		`.text { font: 16px sans-serif; fill: ` + card.Style.Text + `; font-family: ` + card.Style.Textfont + `;}`,
+		`.text { font: 16px sans-serif; fill: ` + card.Style.Text + `; font-family: ` + card.Style.Font + `;}`,
 	}
 	if cap(customStyles) > 0 {
 		style = append(style, customStyles...)
@@ -217,11 +218,14 @@ type Bar struct {
 
 func BarChartVertical(bar Bar) string {
 	_, max := FindMinAndMax(bar.Values)
-	padding := 10
-	width := (len(bar.Values) * 20) + padding
+
+	barGap := 10
+	columnWidth := 30
+	totalWidth := (columnWidth + barGap) * len(bar.Values)
+
 	barChart := []string{
 		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
-			bar.Width, bar.Height, bar.Width, bar.Height),
+			totalWidth, max+120, totalWidth, max+120),
 	}
 	BarChartAdd := func(content string) {
 		barChart = append(barChart, content)
@@ -229,44 +233,63 @@ func BarChartVertical(bar Bar) string {
 
 	// Grid
 	BarChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
-		padding*2, padding, max+(padding*5), width+padding*4))
+		barGap*2, barGap, (max + 30), totalWidth))
 	if bar.Grid {
-		grid := []string{}
-		for i := 0; i < (max/10)+5; i++ {
+		path := []string{}
+		for i := 0; i < ((max / 10) + 3); i++ {
+			path = append(path, fmt.Sprintf(`M %v %v L %v %v`,
+				totalWidth, (barGap*i)+10, barGap*2, (barGap*i)+10))
+
 			// Generate numbers along axis
 			if (i*10)%4 == 0 {
 				BarChartAdd(fmt.Sprintf(`<text style="font-size: 12px" text-anchor="middle" class="text" fill="#333333" x="%v" y="%v">%v</text>`,
-					padding, max+(padding*4)-(padding*i), (i * 10)))
+					10, max-(barGap*i)+30, (i * 10)))
 			}
-
-			// Generate Lines
-			grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, padding*2, (padding*i)+10, width+padding*4, (padding*i)+10)) // Vertical
-			// grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, (padding*i)+padding*3, max+(padding*5), (padding*i)+padding*3, padding)) // Horizontal
 		}
-		BarChartAdd(fmt.Sprintf(`<path d="%v" stroke="#333333" opacity="0.3" stroke-width="1" stroke-linecap="round"/>`,
-			strings.Join(grid, " ")))
+		BarChartAdd(fmt.Sprintf(`<path d="%v" stroke="#333333" opacity="0.3" stroke-width="1" />`, strings.Join(path, " ")))
 	}
 	BarChartAdd(`</g>`)
 
-	// Add points
+	// Add columns
 	content := []string{}
-	for _, val := range bar.Values {
-		content = append(content, fmt.Sprintf(`<g transform="translate(0,0)" class="bar"><rect x="%v" y="%v" width="%v" height="%v" fill="%v"/><text x="%v" y="10" fill="#000000" text-anchor="middle">%v</text></g>`, padding*3, max-(val-padding), 20, val, "#ff0000", val+10, val))
+	for i, v := range bar.Values {
+		if len(bar.Colors) > i {
+			if len(bar.Labels) > i {
+				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="#%v"/><text x="%v" y="%v" fill="#000000" text-anchor="middle">%v</text></g>`,
+					(20+barGap)*i, (max+30)-v, v, v, bar.Colors[i], (v+20)+len(bar.Labels[i]), -5, bar.Labels[i]))
+			} else {
+				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="#%v"/></g>`,
+					(20+barGap)*i, (max+30)-v, v, v, bar.Colors[i]))
+			}
+		} else {
+			if len(bar.Labels) > i {
+				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/><text transform="rotate(90)" x="%v" y="%v" fill="#000000" text-anchor="middle">%v</text></g>`,
+					(20+barGap)*i, (max+30)-v, 20, v, "#ff0000", (v+20)+len(bar.Labels[i]), -5, bar.Labels[i]))
+			} else {
+				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/></g>`,
+					(20+barGap)*i, (max+30)-v, 20, v, "#ff0000"))
+			}
+
+		}
 	}
+
 	// Generate Row for columns
-	BarChartAdd(FlexBox(bar.Width, 0, max-80, padding, content, true))
+	BarChartAdd(FlexBox(bar.Height, barGap*3, 0, barGap, content, true))
 
 	BarChartAdd(`</g></svg>`)
 	return strings.Join(barChart, "\n")
 }
 
-func BarChart(bar Bar) string {
+// Bar Chart Horizontal
+func BarChartHorizontal(bar Bar) string {
 
 	_, max := FindMinAndMax(bar.Values)
 
 	barGap := 10
 	columnHeight := 30
-	totalHeight := (columnHeight + 10) * len(bar.Values)
+
+	// Calculate total height of all columns including padding between columns
+	totalHeight := (columnHeight + barGap) * len(bar.Values)
 
 	barChart := []string{
 		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
@@ -282,12 +305,13 @@ func BarChart(bar Bar) string {
 	BarChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
 		barGap, barGap, totalHeight+20, ((max/10)+3)*10))
 	if bar.Grid {
+		path := []string{}
 		for i := 0; i < (max/10)+3; i++ {
-			BarChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" opacity="0.3" stroke-width="1" />`,
+			path = append(path, fmt.Sprintf(`M %v %v L %v %v`,
 				(barGap*i)+10, totalHeight+20, (barGap*i)+10, barGap))
 
 			// Lines at bottom
-			BarChartAdd(fmt.Sprintf(`<path d="M %v %v L %v %v" stroke="#333333" stroke-width="3" />`,
+			path = append(path, fmt.Sprintf(`M %v %v L %v %v`,
 				(barGap*i)+10, totalHeight+20, (barGap*i)+10, totalHeight+30))
 
 			// Generate numbers along axis
@@ -296,6 +320,7 @@ func BarChart(bar Bar) string {
 					(barGap*i)+10, totalHeight+40, (i * 10)))
 			}
 		}
+		BarChartAdd(fmt.Sprintf(`<path d="%v" stroke="#333333" opacity="0.3" stroke-width="1" />`, strings.Join(path, " ")))
 	}
 	BarChartAdd(`</g>`)
 
@@ -340,7 +365,7 @@ func LineChart(line Line) string {
 
 	// Grid
 	LineChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
-		padding*2, padding*2, max+(padding*4), width+padding))
+		padding*2, padding, max+(padding*4), width+padding))
 	if line.GridHorizontal || line.GridVertical {
 		grid := []string{}
 		for i := 0; i < (max/10)+3; i++ {
@@ -445,10 +470,25 @@ func GetProgressAnimation(progress, radius int) string {
 		}
 	}`
 }
-func GenerateCard(style style.Styles, defs []string, body []string, width, height int, customStyles ...string) []string {
+func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, height int, customStyles ...string) []string {
 	var card Card
-	card.Style = style
+	card.Style = cardstyle
 
+	// Calculate rotation
+	/*
+		// Rotation can be 0 to 360
+		var anglePI = (angle) * (Math.PI / 180);
+		var angleCoords = {
+		    'x1': Math.round(50 + Math.sin(anglePI) * 50) + '%',
+		    'y1': Math.round(50 + Math.cos(anglePI) * 50) + '%',
+		    'x2': Math.round(50 + Math.sin(anglePI + Math.PI) * 50) + '%',
+		    'y2': Math.round(50 + Math.cos(anglePI + Math.PI) * 50) + '%',
+		}
+
+	*/
+	if cardstyle.Name == "retro" {
+		defs = append(defs, style.LinearGradient("retro", 0, []string{"#fc00ff", "#00dbde"}))
+	}
 	card.Body = []string{
 		fmt.Sprintf(`<svg width="%v" height="%v" viewBox="0 0 %v %v" xmlns="http://www.w3.org/2000/svg">`, width, height, width, height),
 		card.GetStyles(customStyles...),

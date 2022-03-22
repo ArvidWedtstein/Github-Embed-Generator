@@ -2,6 +2,7 @@ package style
 
 import (
 	"fmt"
+	"githubembedapi/card/themes"
 	"regexp"
 	"strings"
 )
@@ -15,8 +16,8 @@ type Styles struct {
 	Box string
 }
 
-func CheckHex(str map[string]string) Styles {
-	var style Styles
+func CheckHex(str map[string]string) themes.Theme {
+	var style themes.Theme
 	r, _ := regexp.Compile("^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
 	if !r.MatchString(str["Border"]) {
 		style.Border = "#000000"
@@ -59,9 +60,9 @@ func RadialGradient(id string, colors []string) string {
 	gradient = append(gradient, `</radialGradient>`)
 	return strings.Join(gradient, "\n")
 }
-func LinearGradient(id string, colors []string) string {
+func LinearGradient(id string, degree int, colors []string) string {
 	gradient := []string{
-		fmt.Sprintf(`<linearGradient x="0" y="0" x2="100" id="%v" gradientUnits="userSpaceOnUse">`, id),
+		fmt.Sprintf(`<linearGradient x="0" y="0" id="%v" gradientUnits="userSpaceOnUse" gradientTransform="rotate(%v)">`, id, degree),
 	}
 	if cap(colors) < 2 {
 		panic(`Gradient must have 2 colors`)
@@ -114,6 +115,15 @@ func WavyFilter() string {
 		
 	</filter>"
 	`
+}
+func NeonFilter(color string) string {
+	filter := fmt.Sprintf(`<filter id="glow" height="300%" width="300%" x="-75%" y="-75%">
+	<feMorphology operator="dilate" radius="2" in="SourceAlpha" result="thicken" />
+	<feGaussianBlur in="thicken" stdDeviation="10" result="blurred" />
+	<feFlood flood-color="%v" result="glowColor" />
+	<feComposite in="glowColor" in2="blurred" operator="in" result="softGlow_colored" />
+	<feMerge><feMergeNode in="softGlow_colored"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`, color)
+	return filter
 }
 func Table() string {
 	return `<filter id="table" x="0" y="0" width="100%" height="100%">

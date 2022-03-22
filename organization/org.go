@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -131,7 +132,7 @@ type Activity []struct {
 	Days  []int `json:"days"`
 }
 
-func MostactivityCard(title, org string, cardstyle style.Styles) string {
+func MostactivityCard(title, org string, cardstyle themes.Theme) string {
 	apiurl := "https://api.github.com/orgs/" + org + "/repos"
 	// Create a new request using http
 	req, err := http.NewRequest("GET", apiurl, nil)
@@ -169,7 +170,7 @@ func MostactivityCard(title, org string, cardstyle style.Styles) string {
 
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
-		`.text { font: 20px sans-serif; fill: ` + cardstyle.Text + `; font-family: ` + cardstyle.Textfont + `; text-decoration: underline;}`,
+		`.text { font: 20px sans-serif; fill: ` + cardstyle.Text + `; font-family: ` + cardstyle.Font + `; text-decoration: underline;}`,
 		`.large {
 			font: 25px sans-serif; 
 			fill: black
@@ -189,7 +190,7 @@ func MostactivityCard(title, org string, cardstyle style.Styles) string {
 		}`,
 	}
 	defs := []string{
-		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
 	}
 
 	body := []string{

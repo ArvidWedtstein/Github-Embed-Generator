@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -53,7 +54,7 @@ type StreakData struct {
 	} `json:"data"`
 }
 
-func Streak(user, hide_title string, cardstyle style.Styles) string {
+func Streak(user, hide_title string, cardstyle themes.Theme) string {
 
 	year := time.Now().Year()
 	jsonData := map[string]string{
@@ -224,12 +225,12 @@ func Streak(user, hide_title string, cardstyle style.Styles) string {
 	}
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
-		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
 		style.WavyFilter(),
 	}
 
 	body := []string{
-		fmt.Sprintf(`<rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width, height),
+		fmt.Sprintf(`<g><rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width, height),
 	}
 
 	bodyAdd := func(content string) string {
@@ -261,6 +262,6 @@ func Streak(user, hide_title string, cardstyle style.Styles) string {
 
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Total Contributions</text>`, (width/2)-120, (height/2)-30))
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)-130, (height/2)+5, stats.TotalContributions))
-
+	bodyAdd(`</g>`)
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, customstyles...), "\n")
 }

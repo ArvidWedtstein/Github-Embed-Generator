@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"githubembedapi/card"
-	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -35,7 +35,7 @@ type Author struct {
 	Avatar_Url string `json:"avatar_url"`
 }
 
-func Rankcard(title string, users []string, cardstyle style.Styles) string {
+func Rankcard(title string, users []string, cardstyle themes.Theme) string {
 	if title == "" || len(title) < 1 {
 		title = "Rank"
 	}
@@ -45,7 +45,7 @@ func Rankcard(title string, users []string, cardstyle style.Styles) string {
 
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
-		`.text { font: 20px sans-serif; fill: ` + cardstyle.Text + `; font-family: ` + cardstyle.Textfont + `; text-decoration: underline;}`,
+		`.text { font: 20px sans-serif; fill: ` + cardstyle.Text + `; font-family: ` + cardstyle.Font + `; text-decoration: underline;}`,
 		`.large { font: 25px sans-serif; fill: black}`,
 		`.title { font: 25px sans-serif; fill: ` + cardstyle.Title + `}`,
 		`.box { fill: ` + cardstyle.Background + `}`,

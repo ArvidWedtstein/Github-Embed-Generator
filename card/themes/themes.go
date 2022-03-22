@@ -16,16 +16,6 @@ type Theme struct {
 	Font       string `json:"font"`
 }
 
-type Themes []struct {
-	Name       string `json:"name"`
-	Title      string `json:"title"`
-	Text       string `json:"text"`
-	Border     string `json:"border"`
-	Background string `json:"background"`
-	Box        string `json:"box"`
-	Font       string `json:"font"`
-}
-
 func LoadTheme(themeName string) Theme {
 	jsonFile, err := os.Open("card/themes/themes.json")
 
@@ -36,7 +26,7 @@ func LoadTheme(themeName string) Theme {
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-	var themes Themes
+	var themes []Theme
 	json.Unmarshal(byteValue, &themes)
 
 	var selectedTheme Theme

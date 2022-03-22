@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -41,7 +42,7 @@ type Languages struct {
 	Color string `json:"color"`
 }
 
-func LanguageCard(title, user, langs_count string, cardstyle style.Styles) string {
+func LanguageCard(title, user, langs_count string, cardstyle themes.Theme) string {
 	lang_count, _ := strconv.Atoi(langs_count)
 	if len(langs_count) <= 0 {
 		lang_count = 10
@@ -107,7 +108,7 @@ func LanguageCard(title, user, langs_count string, cardstyle style.Styles) strin
 	}
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
-		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
 	}
 
 	if len(title) <= 0 {
@@ -119,7 +120,7 @@ func LanguageCard(title, user, langs_count string, cardstyle style.Styles) strin
 		fmt.Sprintf(`<g id="Box"><rect x="0" y="0" rx="15" fill="%v" width="%v" height="%v" /></g>`, cardstyle.Background, 800, 300),
 		`<g data-testid="card-text">`,
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v</text>`, padding, padding, card.ToTitleCase(title)),
-		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, padding),
+		fmt.Sprintf(`<line id="gradLine"  x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, padding),
 		`</g>`,
 	}
 
@@ -164,5 +165,5 @@ func LanguageCard(title, user, langs_count string, cardstyle style.Styles) strin
 	}
 	body = append(body, card.FlexBox(270, 20, 30, padding, content, false))
 	body = append(body, card.PieChart(slices, 60, 400, 150, "#ff0000"))
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, 800, 300, customstyles...), "\n")
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 300, customstyles...), "\n")
 }

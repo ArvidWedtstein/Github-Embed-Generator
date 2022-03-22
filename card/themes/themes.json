@@ -23,12 +23,18 @@
     "text": "#ffffff",
     "background": "#url(rgb)",
     "border": "#333333",
-    "box": "#url(rgb)",
+    "box": "url(#rgb)",
     "font": "Helvetica"
   },
   {
     "name": "lartrags",
     "border": "#333333",
     "font": "Helvetica"
+  },
+  {
+    "name": "retro",
+    "title": "#ffffff",
+    "border": "#333333",
+    "background": "url(#retro)"
   }
 ]

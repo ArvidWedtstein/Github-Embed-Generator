@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -70,7 +71,7 @@ func recoverFromError() {
 		fmt.Println("recovered from ", r)
 	}
 }
-func Project(user, project string, cardstyle style.Styles) string {
+func Project(user, project string, cardstyle themes.Theme) string {
 	goal := 1000
 
 	apiurl := "https://api.github.com/repos/" + user + "/" + project + "/stats/contributors"
@@ -172,7 +173,7 @@ func Project(user, project string, cardstyle style.Styles) string {
 
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
-		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
 		// style.StarsFilter(),
 		style.DropShadowRing1(),
 		// style.CubePattern(),

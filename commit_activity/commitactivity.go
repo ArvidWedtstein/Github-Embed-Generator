@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
+	"githubembedapi/card/themes"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -23,7 +24,7 @@ func recoverFromError() {
 		fmt.Println("recovered from ", r)
 	}
 }
-func RepositoryCommitActivity(title, user, repo string, hide_week string, cardstyle style.Styles) string {
+func RepositoryCommitActivity(title, user, repo string, hide_week string, cardstyle themes.Theme) string {
 	apiurl := "https://api.github.com/repos/" + user + "/" + repo + "/stats/commit_activity"
 
 	reqAPI, err := http.NewRequest("GET", apiurl, nil)
@@ -59,7 +60,7 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 	}
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
-		style.LinearGradient("gradient-fill", []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
 	}
 
 	var gitcolors = map[string]string{
