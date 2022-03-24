@@ -127,8 +127,12 @@ func language(c *gin.Context) {
 
 	title := c.Request.FormValue("title")
 	user := c.Request.FormValue("user")
+	org := c.Request.FormValue("organization")
 	langs_count := c.Request.FormValue("langs_count")
 
+	if len(org) > 0 && len(user) < 1 {
+		user = org
+	}
 	var color = style.CheckTheme(c)
 
 	c.String(http.StatusOK, languageCard.LanguageCard(title, user, langs_count, color))
