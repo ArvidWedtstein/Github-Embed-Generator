@@ -62,5 +62,15 @@
       "box": "#333333"
     },
     "font": "Helvetica"
+  },
+  {
+    "name": "toringe",
+    "colors": {
+      "title": "",
+      "text": "",
+      "background": "",
+      "border": "",
+      "box": ""
+    }
   }
 ]
