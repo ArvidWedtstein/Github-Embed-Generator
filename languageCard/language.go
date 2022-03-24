@@ -177,13 +177,27 @@ func LanguageCard(title, user, langs_count string, cardstyle themes.Theme, isOrg
 	}
 
 	languages := map[string]Languages{}
-	for _, v := range data.Data.User.Repositories.Nodes {
-		if len(v.Languages.Edges) > 0 {
-			for _, langs := range v.Languages.Edges {
-				if _, ok := languages[langs.Node.Name]; ok {
-					languages[langs.Node.Name] = Languages{Size: languages[langs.Node.Name].Size + langs.Size, Color: langs.Node.Color}
-				} else {
-					languages[langs.Node.Name] = Languages{Size: langs.Size, Color: langs.Node.Color}
+	if isOrganization {
+		for _, v := range dataorg.Data.Organization.Repositories.Nodes {
+			if len(v.Languages.Edges) > 0 {
+				for _, langs := range v.Languages.Edges {
+					if _, ok := languages[langs.Node.Name]; ok {
+						languages[langs.Node.Name] = Languages{Size: languages[langs.Node.Name].Size + langs.Size, Color: langs.Node.Color}
+					} else {
+						languages[langs.Node.Name] = Languages{Size: langs.Size, Color: langs.Node.Color}
+					}
+				}
+			}
+		}
+	} else {
+		for _, v := range data.Data.User.Repositories.Nodes {
+			if len(v.Languages.Edges) > 0 {
+				for _, langs := range v.Languages.Edges {
+					if _, ok := languages[langs.Node.Name]; ok {
+						languages[langs.Node.Name] = Languages{Size: languages[langs.Node.Name].Size + langs.Size, Color: langs.Node.Color}
+					} else {
+						languages[langs.Node.Name] = Languages{Size: langs.Size, Color: langs.Node.Color}
+					}
 				}
 			}
 		}
