@@ -130,12 +130,14 @@ func language(c *gin.Context) {
 	org := c.Request.FormValue("organization")
 	langs_count := c.Request.FormValue("langs_count")
 
+	var isOrg bool = false
 	if len(org) > 0 && len(user) < 1 {
 		user = org
+		isOrg = true
 	}
 	var color = style.CheckTheme(c)
 
-	c.String(http.StatusOK, languageCard.LanguageCard(title, user, langs_count, color))
+	c.String(http.StatusOK, languageCard.LanguageCard(title, user, langs_count, color, isOrg))
 }
 func rankList(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")

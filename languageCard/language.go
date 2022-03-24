@@ -42,7 +42,7 @@ type Languages struct {
 	Color string `json:"color"`
 }
 
-func LanguageCard(title, user, langs_count string, cardstyle themes.Theme) string {
+func LanguageCard(title, user, langs_count string, cardstyle themes.Theme, isOrganization bool) string {
 	lang_count, _ := strconv.Atoi(langs_count)
 	if len(langs_count) <= 0 {
 		lang_count = 10
@@ -51,6 +51,7 @@ func LanguageCard(title, user, langs_count string, cardstyle themes.Theme) strin
 		Key   string
 		Value Languages
 	}
+
 	jsonData := map[string]string{
 		"query": fmt.Sprintf(`
 		{
@@ -72,6 +73,30 @@ func LanguageCard(title, user, langs_count string, cardstyle themes.Theme) strin
 		  }
 		}
 		`, user),
+	}
+	if isOrganization {
+		jsonData = map[string]string{
+			"query": fmt.Sprintf(`
+			{
+			organization(login: "%v") {
+				repositories(isFork: false, privacy: PUBLIC, first: 100) {
+				nodes {
+					name
+					languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+					edges {
+						size
+						node {
+						color
+						name
+						}
+					}
+					}
+				}
+				}
+			}
+		}
+		`, user),
+		}
 	}
 
 	jsonValue, _ := json.Marshal(jsonData)
