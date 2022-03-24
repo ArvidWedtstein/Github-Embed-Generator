@@ -139,12 +139,15 @@ type Radar struct {
 	Grid   bool
 	Width  int
 	Height int
+	PosX   int
+	PosY   int
 }
 
 func (radar Radar) generateGrid() string {
 	centerX := (radar.Width / 2)
 	centerY := (radar.Height / 2)
-	var rings int = 7
+
+	var rings int = 10
 
 	gridgap := 20
 	path := []string{}
@@ -183,7 +186,7 @@ func RadarChart(radar Radar) string {
 	centerY := (radar.Height / 2)
 	sectionDegree := 360 / (len(radar.Values))
 	radarChart := []string{
-		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g width="%v" height="%v">`, radar.Width, radar.Height, radar.Width, radar.Height, radar.Width, radar.Height),
+		fmt.Sprintf(`<g transform="translate(%v,%v) scale(0.5)" width="%v" height="%v">`, radar.PosX, radar.PosY, radar.Width, radar.Height),
 	}
 
 	if radar.Grid {
@@ -202,7 +205,7 @@ func RadarChart(radar Radar) string {
 		radarChart = append(radarChart, fmt.Sprintf(`<circle cx="%v" cy="%v" fill="%v" r="3" />`, float64(centerX)+x, float64(centerY)+y, radar.Color))
 	}
 	radarChart = append(radarChart, fmt.Sprintf(`<polygon points="%v" fill="%v" opacity="0.5" stroke="%v" stroke-width="3"/>`, strings.Join(pathData, " "), radar.Color, radar.Color))
-	radarChart = append(radarChart, `</g></svg>`)
+	radarChart = append(radarChart, `</g>`)
 	return strings.Join(radarChart, " ")
 }
 
