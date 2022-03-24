@@ -6,14 +6,17 @@ import (
 	"os"
 )
 
-type Theme struct {
-	Name       string `json:"name"`
+type Colors struct {
 	Title      string `json:"title"`
 	Text       string `json:"text"`
 	Border     string `json:"border"`
 	Background string `json:"background"`
 	Box        string `json:"box"`
-	Font       string `json:"font"`
+}
+type Theme struct {
+	Name   string `json:"name"`
+	Colors Colors `json:"colors"`
+	Font   string `json:"font"`
 }
 
 func LoadTheme(themeName string) Theme {

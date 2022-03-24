@@ -6,6 +6,8 @@ import (
 	"math"
 	"regexp"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Styles struct {
@@ -17,60 +19,55 @@ type Styles struct {
 	Box string
 }
 
-func CheckHex(str map[string]string) themes.Theme {
-	var style themes.Theme
-	r, _ := regexp.Compile("^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
-	if !r.MatchString(str["Border"]) && !strings.ContainsAny(str["Border"], "url #") {
-		style.Border = "#000000"
+func CheckTheme(c *gin.Context) themes.Theme {
+	var SelectedTheme themes.Theme
+	if len(c.Request.FormValue("theme")) < 1 {
+		SelectedTheme = themes.LoadTheme("light")
 	} else {
-		if !strings.Contains(str["Border"], "#") {
-			style.Border = "#" + str["Border"]
-		} else {
-			style.Border = str["Border"]
-		}
-	}
-	if !r.MatchString(str["Title"]) && !strings.ContainsAny(str["Title"], "url #") {
-		style.Title = "#000000"
-	} else {
-		if !strings.Contains(str["Title"], "#") {
-			style.Title = "#" + str["Title"]
-		} else {
-			style.Title = str["Title"]
-		}
-	}
-	if !r.MatchString(str["Background"]) && !strings.ContainsAny(str["Background"], "url #") {
-		fmt.Println(str["Background"])
-		style.Background = "#ffffff"
-	} else {
-		if !strings.Contains(str["Background"], "#") {
-			style.Background = "#" + str["Background"]
-		} else {
-			style.Background = str["Background"]
-		}
-	}
-	if !r.MatchString(str["Text"]) && !strings.ContainsAny(str["Text"], "url #") {
-		style.Text = "#000000"
-	} else {
-		if !strings.Contains(str["Text"], "#") {
-			style.Text = "#" + str["Text"]
-		} else {
-			style.Text = str["Text"]
-		}
-	}
-	if !r.MatchString(str["Box"]) && !strings.ContainsAny(str["Box"], "url #") {
-		style.Box = "#dddddd"
-	} else {
-		if !strings.Contains(str["Box"], "#") {
-			style.Box = "#" + str["Box"]
-		} else {
-			style.Box = str["Box"]
-		}
-	}
-	if len(str["font"]) < 1 {
-		style.Font = "Helvetica"
+		SelectedTheme = themes.LoadTheme(c.Request.FormValue("theme"))
 	}
 
-	return style
+	colors := map[string]string{
+		"Title":      c.Request.FormValue("titlecolor"),
+		"Text":       c.Request.FormValue("textcolor"),
+		"Background": c.Request.FormValue("backgroundcolor"),
+		"Border":     c.Request.FormValue("bordercolor"),
+		"Box":        c.Request.FormValue("boxcolor"),
+	}
+
+	for key, value := range colors {
+		if len(value) > 0 {
+			r, _ := regexp.Compile("^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
+			if r.MatchString(value) {
+				colors[key] = "#" + value
+			}
+		} else {
+			delete(colors, key)
+		}
+	}
+
+	// Find a dynamic solution for this crap. Can't iterate through structs
+	for k, v := range colors {
+		if k == "Title" {
+			SelectedTheme.Colors.Title = v
+		}
+		if k == "Text" {
+			SelectedTheme.Colors.Text = v
+		}
+		if k == "Border" {
+			SelectedTheme.Colors.Border = v
+		}
+		if k == "Background" {
+			SelectedTheme.Colors.Background = v
+		}
+		if k == "Box" {
+			SelectedTheme.Colors.Box = v
+		}
+	}
+	if len(c.Request.FormValue("font")) < 1 {
+		SelectedTheme.Font = "Helvetica"
+	}
+	return SelectedTheme
 }
 
 func RadialGradient(id string, colors []string) string {

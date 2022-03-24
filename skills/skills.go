@@ -14,7 +14,7 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 	if title == "" || len(title) <= 0 {
 		title = "Skills"
 	}
-	fmt.Println(cardstyle.Title)
+	fmt.Println(cardstyle.Colors.Title)
 	height := 700
 	width := 600
 	titleboxheight := 50
@@ -26,13 +26,13 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
 		`.repobox { 
-			fill: ` + cardstyle.Box + `;
-			border: ` + strconv.Itoa(strokewidth) + `px solid #` + cardstyle.Border + `;
+			fill: ` + cardstyle.Colors.Box + `;
+			border: ` + strconv.Itoa(strokewidth) + `px solid #` + cardstyle.Colors.Border + `;
 		}`,
 		`.box {
-			fill: ` + cardstyle.Background + `;
-			border: 3px solid #` + cardstyle.Border + `;
-			stroke: ` + cardstyle.Border + `;
+			fill: ` + cardstyle.Colors.Background + `;
+			border: 3px solid #` + cardstyle.Colors.Border + `;
+			stroke: ` + cardstyle.Colors.Border + `;
 			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
 		}`,
 	}
@@ -128,7 +128,7 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 	}
 
 	// Line on top
-	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="%v"/>`, titleboxheight, width, strokewidth, cardstyle.Border)}, body...)
+	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="%v"/>`, titleboxheight, width, strokewidth, cardstyle.Colors.Border)}, body...)
 	body = append([]string{fmt.Sprintf(`<rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width, height)}, body...)
 
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, customstyles...), "\n")

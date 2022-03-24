@@ -73,7 +73,7 @@ func RepositoryCommitActivity(title, user, repo string, hide_week string, cardst
 	paddingX := 30
 	paddingY := 30
 	body := []string{
-		fmt.Sprintf(`<g id="Box"><rect x="0" y="0" rx="15" fill="%v" width="%v" height="%v" /></g>`, cardstyle.Background, 700, 200),
+		fmt.Sprintf(`<g id="Box"><rect x="0" y="0" rx="15" fill="%v" width="%v" height="%v" /></g>`, cardstyle.Colors.Background, 700, 200),
 		`<g data-testid="card-text">`,
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v Stats</text>`, paddingX, paddingY, card.ToTitleCase(repo)),
 		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, paddingX),

@@ -170,22 +170,22 @@ func MostactivityCard(title, org string, cardstyle themes.Theme) string {
 
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
-		`.text { font: 20px sans-serif; fill: ` + cardstyle.Text + `; font-family: ` + cardstyle.Font + `; text-decoration: underline;}`,
+		`.text { font: 20px sans-serif; fill: ` + cardstyle.Colors.Text + `; font-family: ` + cardstyle.Font + `; text-decoration: underline;}`,
 		`.large {
 			font: 25px sans-serif; 
 			fill: black
 		}`,
-		`.title { font: 25px sans-serif; fill: #` + cardstyle.Title + `}`,
+		`.title { font: 25px sans-serif; fill: #` + cardstyle.Colors.Title + `}`,
 		`.repobox { 
-			fill: ` + cardstyle.Box + `;
-			border: ` + strconv.Itoa(strokewidth) + `px solid ` + cardstyle.Border + `;
+			fill: ` + cardstyle.Colors.Box + `;
+			border: ` + strconv.Itoa(strokewidth) + `px solid ` + cardstyle.Colors.Border + `;
 		}`,
 		`.repobox:hover { fill: rgba(255,0,0,0.8);}`,
 		`.repobox:hover rect {filter: blur(30px);}`,
 		`.box {
-			fill: ` + cardstyle.Background + `;
-			border: 3px solid ` + cardstyle.Border + `;
-			stroke: ` + cardstyle.Border + `;
+			fill: ` + cardstyle.Colors.Background + `;
+			border: 3px solid ` + cardstyle.Colors.Border + `;
+			stroke: ` + cardstyle.Colors.Border + `;
 			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
 		}`,
 	}
@@ -273,7 +273,7 @@ func MostactivityCard(title, org string, cardstyle themes.Theme) string {
 		posY += boxheight + padding
 	}
 	bodyAdd(`</g>`)
-	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="#%v"/>`, titleboxheight, width, strokewidth, cardstyle.Border)}, body...)
+	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="#%v"/>`, titleboxheight, width, strokewidth, cardstyle.Colors.Border)}, body...)
 	body = append([]string{fmt.Sprintf(`<rect x="0" y="0" class="box" width="%v" height="%v" rx="15"  />`, width, height)}, body...)
 
 	return strings.Join(card.GenerateCard(cardstyle, defs, body, width, height, customstyles...), "\n")

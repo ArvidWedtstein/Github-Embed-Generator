@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"githubembedapi/card"
 	"githubembedapi/card/style"
-	"githubembedapi/card/themes"
 	"githubembedapi/commit_activity"
 	"githubembedapi/languageCard"
 	"githubembedapi/organization"
@@ -94,194 +93,74 @@ func bar(c *gin.Context) {
 func getMostactivity(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 
-	var color themes.Theme
-	styles := map[string]string{
-		"Title":      c.Request.FormValue("titlecolor"),
-		"Border":     c.Request.FormValue("bordercolor"),
-		"Background": c.Request.FormValue("backgroundcolor"),
-		"Text":       c.Request.FormValue("textcolor"),
-		"Box":        c.Request.FormValue("boxcolor"),
-	}
-	color = style.CheckHex(styles)
 	org := c.Request.FormValue("org")
 	title := c.Request.FormValue("title")
+
+	var color = style.CheckTheme(c)
 
 	c.String(http.StatusOK, organization.MostactivityCard(title, org, color))
 }
 func repositoryCommitActivity(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 
-	var color themes.Theme
-	styles := map[string]string{
-		"Title":      c.Request.FormValue("titlecolor"),
-		"Border":     c.Request.FormValue("bordercolor"),
-		"Background": c.Request.FormValue("backgroundcolor"),
-		"Text":       c.Request.FormValue("textcolor"),
-		"Box":        c.Request.FormValue("boxcolor"),
-	}
-	color = style.CheckHex(styles)
 	user := c.Request.FormValue("user")
 	repo := c.Request.FormValue("repo")
 	title := c.Request.FormValue("title")
 	var hide_week string = c.Request.FormValue("hide_week")
 
+	var color = style.CheckTheme(c)
+
 	c.String(http.StatusOK, commit_activity.RepositoryCommitActivity(title, user, repo, hide_week, color))
 }
 func projectcard(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
-	var color themes.Theme
 
 	user := c.Request.FormValue("user")
 	repo := c.Request.FormValue("repo")
-	theme := c.Request.FormValue("theme")
 
-	if len(theme) > 0 {
-		selectedTheme := themes.LoadTheme(theme)
-		color = style.CheckHex(map[string]string{
-			"Title":      selectedTheme.Title,
-			"Text":       selectedTheme.Text,
-			"Background": selectedTheme.Background,
-			"Border":     selectedTheme.Border,
-			"Box":        selectedTheme.Box,
-			"Font":       selectedTheme.Font,
-		})
-		color.Name = selectedTheme.Name
-	} else {
-		styles := map[string]string{
-			"Title":      c.Request.FormValue("titlecolor"),
-			"Border":     c.Request.FormValue("bordercolor"),
-			"Background": c.Request.FormValue("backgroundcolor"),
-			"Text":       c.Request.FormValue("textcolor"),
-			"Box":        c.Request.FormValue("boxcolor"),
-		}
-		color = style.CheckHex(styles)
-	}
+	var color = style.CheckTheme(c)
 
 	c.String(http.StatusOK, project.Project(user, repo, color))
 }
 func language(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
-	var color themes.Theme
 
 	title := c.Request.FormValue("title")
 	user := c.Request.FormValue("user")
 	langs_count := c.Request.FormValue("langs_count")
-	theme := c.Request.FormValue("theme")
 
-	if len(theme) > 0 {
-		selectedTheme := themes.LoadTheme(theme)
-		color = style.CheckHex(map[string]string{
-			"Title":      selectedTheme.Title,
-			"Text":       selectedTheme.Text,
-			"Background": selectedTheme.Background,
-			"Border":     selectedTheme.Border,
-			"Box":        selectedTheme.Box,
-			"Font":       selectedTheme.Font,
-		})
-		color.Name = selectedTheme.Name
-	} else {
-		styles := map[string]string{
-			"Title":      c.Request.FormValue("titlecolor"),
-			"Border":     c.Request.FormValue("bordercolor"),
-			"Background": c.Request.FormValue("backgroundcolor"),
-			"Text":       c.Request.FormValue("textcolor"),
-			"Box":        c.Request.FormValue("boxcolor"),
-		}
-		color = style.CheckHex(styles)
-	}
+	var color = style.CheckTheme(c)
+
 	c.String(http.StatusOK, languageCard.LanguageCard(title, user, langs_count, color))
 }
 func rankList(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
-	var color themes.Theme
 
 	users := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("users")), ",")
 	title := c.Request.FormValue("title")
 
-	theme := c.Request.FormValue("theme")
+	var color = style.CheckTheme(c)
 
-	if len(theme) > 0 {
-		selectedTheme := themes.LoadTheme(theme)
-		color = style.CheckHex(map[string]string{
-			"Title":      selectedTheme.Title,
-			"Text":       selectedTheme.Text,
-			"Background": selectedTheme.Background,
-			"Border":     selectedTheme.Border,
-			"Box":        selectedTheme.Box,
-			"Font":       selectedTheme.Font,
-		})
-		color.Name = selectedTheme.Name
-	} else {
-		styles := map[string]string{
-			"Title":      c.Request.FormValue("titlecolor"),
-			"Border":     c.Request.FormValue("bordercolor"),
-			"Background": c.Request.FormValue("backgroundcolor"),
-			"Text":       c.Request.FormValue("textcolor"),
-		}
-		color = style.CheckHex(styles)
-	}
 	c.String(http.StatusOK, rank.Rankcard(title, users, color))
 }
 func userstreak(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 
-	var color themes.Theme
 	user := c.Request.FormValue("user")
 	hide_title := c.Request.FormValue("hide_title")
-	theme := c.Request.FormValue("theme")
 
-	if len(theme) > 0 {
-		selectedTheme := themes.LoadTheme(theme)
-		color = style.CheckHex(map[string]string{
-			"Title":      selectedTheme.Title,
-			"Text":       selectedTheme.Text,
-			"Background": selectedTheme.Background,
-			"Border":     selectedTheme.Border,
-			"Box":        selectedTheme.Box,
-			"Font":       selectedTheme.Font,
-		})
-		color.Name = selectedTheme.Name
-	} else {
-		styles := map[string]string{
-			"Title":      c.Request.FormValue("titlecolor"),
-			"Border":     c.Request.FormValue("bordercolor"),
-			"Background": c.Request.FormValue("backgroundcolor"),
-			"Text":       c.Request.FormValue("textcolor"),
-		}
-		color = style.CheckHex(styles)
-	}
+	var color = style.CheckTheme(c)
+
 	c.String(http.StatusOK, streak.Streak(user, hide_title, color))
 }
 func getSkills(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 
 	// Define styles
-	var color themes.Theme
 	languages := strings.Split(c.Request.URL.Query().Get("languages"), ",")
 	title := c.Request.FormValue("title")
-	theme := c.Request.FormValue("theme")
 
-	if len(theme) > 0 {
-		selectedTheme := themes.LoadTheme(theme)
-		color = style.CheckHex(map[string]string{
-			"Title":      selectedTheme.Title,
-			"Text":       selectedTheme.Text,
-			"Background": selectedTheme.Background,
-			"Border":     selectedTheme.Border,
-			"Box":        selectedTheme.Box,
-			"Font":       selectedTheme.Font,
-		})
-		color.Name = selectedTheme.Name
-	} else {
-		styles := map[string]string{
-			"Title":      c.Request.FormValue("titlecolor"),
-			"Border":     c.Request.FormValue("bordercolor"),
-			"Background": c.Request.FormValue("backgroundcolor"),
-			"Text":       c.Request.FormValue("textcolor"),
-			"Box":        c.Request.FormValue("boxcolor"),
-		}
-		color = style.CheckHex(styles)
-	}
+	var color = style.CheckTheme(c)
 
 	c.String(http.StatusOK, skills.Skills(title, languages, color))
 }

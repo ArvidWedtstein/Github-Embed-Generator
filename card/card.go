@@ -18,8 +18,8 @@ type Card struct {
 func (card Card) GetStyles(customStyles ...string) string {
 	var style = []string{
 		`<style>`,
-		`.title { font: 25px sans-serif; fill: ` + card.Style.Title + `}`,
-		`.text { font: 16px sans-serif; fill: ` + card.Style.Text + `; font-family: ` + card.Style.Font + `;}`,
+		`.title { font: 25px sans-serif; fill: ` + card.Style.Colors.Title + `}`,
+		`.text { font: 16px sans-serif; fill: ` + card.Style.Colors.Text + `; font-family: ` + card.Style.Font + `;}`,
 	}
 	if cap(customStyles) > 0 {
 		style = append(style, customStyles...)
@@ -473,7 +473,7 @@ func GetProgressAnimation(progress, radius int) string {
 func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, height int, customStyles ...string) []string {
 	var card Card
 	card.Style = cardstyle
-	fmt.Println(cardstyle.Background)
+	fmt.Println(cardstyle.Colors.Background)
 	if cardstyle.Name == "retro" {
 		defs = append(defs, style.LinearGradient("retro", 180, []string{"#fc00ff", "#00dbde"}))
 	}

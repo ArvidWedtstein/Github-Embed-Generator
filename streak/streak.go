@@ -200,11 +200,11 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
 		`.streakcircle {`,
 		`fill: none;`,
-		fmt.Sprintf(`stroke: %v;`, cardstyle.Box),
+		fmt.Sprintf(`stroke: %v;`, cardstyle.Colors.Box),
 		`}`,
 		`.box {
-			fill: ` + cardstyle.Background + `;
-			stroke: ` + cardstyle.Border + `;
+			fill: ` + cardstyle.Colors.Background + `;
+			stroke: ` + cardstyle.Colors.Border + `;
 			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
 		}`,
 		fmt.Sprintf(`.streaktxt {
@@ -212,7 +212,7 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 			font-family: Helvetica;
 			font-weight: 600;
 			fill: %v;
-		}`, cardstyle.Text),
+		}`, cardstyle.Colors.Text),
 		`.mediantxt {
 			font-size: 24px;	
 		}`,
