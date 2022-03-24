@@ -36,6 +36,26 @@ type Data struct {
 		} `json:"user"`
 	} `json:"data"`
 }
+type DataOrg struct {
+	Data struct {
+		Organization struct {
+			Repositories struct {
+				Nodes []struct {
+					Name      string `json:"name"`
+					Languages struct {
+						Edges []struct {
+							Size int `json:"size"`
+							Node struct {
+								Color string `json:"color"`
+								Name  string `json:"name"`
+							}
+						} `json:"edges"`
+					} `json:"languages"`
+				} `json:"nodes"`
+			} `json:"repositories"`
+		} `json:"organization"`
+	} `json:"data"`
+}
 
 type Languages struct {
 	Size  int    `json:"size"`
@@ -78,20 +98,20 @@ func LanguageCard(title, user, langs_count string, cardstyle themes.Theme, isOrg
 		jsonData = map[string]string{
 			"query": fmt.Sprintf(`
 			{
-			organization(login: "%v") {
-				repositories(isFork: false, privacy: PUBLIC, first: 100) {
-				nodes {
-					name
-					languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
-					edges {
-						size
-						node {
-						color
-						name
+				organization(login: "%v") {
+					repositories(ownerAffiliations: OWNER, isFork: false, privacy: PUBLIC, first: 100) {
+						nodes {
+							name
+							languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+							edges {
+								size
+								node {
+									color
+									name
+								}
+							}
 						}
 					}
-					}
-				}
 				}
 			}
 		}
@@ -116,8 +136,15 @@ func LanguageCard(title, user, langs_count string, cardstyle themes.Theme, isOrg
 	if err != nil {
 		panic(err)
 	}
+
 	var data Data
-	json.Unmarshal(responseData, &data)
+	var dataorg DataOrg
+
+	if isOrganization {
+		json.Unmarshal(responseData, &dataorg)
+	} else {
+		json.Unmarshal(responseData, &data)
+	}
 
 	sum := func(values []kv) int {
 		var sum int
