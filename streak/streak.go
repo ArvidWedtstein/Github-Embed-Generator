@@ -79,6 +79,7 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 
 	jsonValue, _ := json.Marshal(jsonData)
 
+	// Make request
 	request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("GITHUB_TOKEN")))
 	if err != nil {
@@ -114,7 +115,6 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 	}
 
 	getContributionDates := func() []Contribution {
-
 		var contributions []Contribution
 		today := time.Now()
 		tomorrow := today.AddDate(0, 0, 1)
@@ -136,7 +136,6 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 		}
 		return contributions
 	}
-
 	getContributionStats := func(contributions []Contribution) Stats {
 		if len(contributions) <= 0 {
 			panic("No contributions exist")
@@ -201,11 +200,10 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
 		`.streakcircle {`,
 		`fill: none;`,
-		fmt.Sprintf(`stroke: %v;`, "#e25822"),
+		fmt.Sprintf(`stroke: %v;`, cardstyle.Box),
 		`}`,
 		`.box {
 			fill: ` + cardstyle.Background + `;
-			border: 3px solid #` + cardstyle.Border + `;
 			stroke: ` + cardstyle.Border + `;
 			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
 		}`,
@@ -225,7 +223,7 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 	}
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
-		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
+		// style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
 		style.WavyFilter(),
 	}
 
@@ -249,10 +247,14 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 	if ctend == time.Now().Format("Jan 2, 2006") {
 		ctend = "Today"
 	}
+
+	// Streak Circle
+	bodyAdd(`<g data-testid="streakcircle">`)
 	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" stroke-width="5" cx="%v" cy="%v" r="50"></circle>`, width/2, height/2))
 	bodyAdd(fmt.Sprintf(`<circle class="streakcircle" stroke-width="%v" filter="url(#wavy) blur(3px)" cx="%v" cy="%v" r="50"></circle>`, strokewidth, width/2, height/2))
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="streaktxt">%v</text>`, (width / 2), (height/2)+15, stats.CurrentStreak.Length))
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="datetxt text">%v - %v</text>`, (width / 2), (height/2)+70, ctstart, ctend))
+	bodyAdd(`</g>`)
 
 	tstart := stats.LongestStreak.Start.Format("Jan 2, 2006")
 	tend := stats.LongestStreak.End.Format("Jan 2, 2006")

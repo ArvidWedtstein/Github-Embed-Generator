@@ -473,9 +473,12 @@ func GetProgressAnimation(progress, radius int) string {
 func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, height int, customStyles ...string) []string {
 	var card Card
 	card.Style = cardstyle
-
+	fmt.Println(cardstyle.Background)
 	if cardstyle.Name == "retro" {
 		defs = append(defs, style.LinearGradient("retro", 180, []string{"#fc00ff", "#00dbde"}))
+	}
+	if cardstyle.Name == "rgb" {
+		defs = append(defs, style.LinearGradient("rgb", 180, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}))
 	}
 
 	card.Body = []string{

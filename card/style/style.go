@@ -20,31 +20,56 @@ type Styles struct {
 func CheckHex(str map[string]string) themes.Theme {
 	var style themes.Theme
 	r, _ := regexp.Compile("^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
-	if !r.MatchString(str["Border"]) {
+	if !r.MatchString(str["Border"]) && !strings.ContainsAny(str["Border"], "url #") {
 		style.Border = "#000000"
 	} else {
-		style.Border = "#" + str["Border"]
+		if !strings.Contains(str["Border"], "#") {
+			style.Border = "#" + str["Border"]
+		} else {
+			style.Border = str["Border"]
+		}
 	}
-	if !r.MatchString(str["Title"]) {
+	if !r.MatchString(str["Title"]) && !strings.ContainsAny(str["Title"], "url #") {
 		style.Title = "#000000"
 	} else {
-		style.Title = "#" + str["Title"]
+		if !strings.Contains(str["Title"], "#") {
+			style.Title = "#" + str["Title"]
+		} else {
+			style.Title = str["Title"]
+		}
 	}
-	if !r.MatchString(str["Background"]) {
+	if !r.MatchString(str["Background"]) && !strings.ContainsAny(str["Background"], "url #") {
+		fmt.Println(str["Background"])
 		style.Background = "#ffffff"
 	} else {
-		style.Background = "#" + str["Background"]
+		if !strings.Contains(str["Background"], "#") {
+			style.Background = "#" + str["Background"]
+		} else {
+			style.Background = str["Background"]
+		}
 	}
-	if !r.MatchString(str["Text"]) {
+	if !r.MatchString(str["Text"]) && !strings.ContainsAny(str["Text"], "url #") {
 		style.Text = "#000000"
 	} else {
-		style.Text = "#" + str["Text"]
+		if !strings.Contains(str["Text"], "#") {
+			style.Text = "#" + str["Text"]
+		} else {
+			style.Text = str["Text"]
+		}
 	}
-	if !r.MatchString(str["Box"]) {
+	if !r.MatchString(str["Box"]) && !strings.ContainsAny(str["Box"], "url #") {
 		style.Box = "#dddddd"
 	} else {
-		style.Box = "#" + str["Box"]
+		if !strings.Contains(str["Box"], "#") {
+			style.Box = "#" + str["Box"]
+		} else {
+			style.Box = str["Box"]
+		}
 	}
+	if len(str["font"]) < 1 {
+		style.Font = "Helvetica"
+	}
+
 	return style
 }
 

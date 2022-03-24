@@ -137,7 +137,15 @@ func projectcard(c *gin.Context) {
 
 	if len(theme) > 0 {
 		selectedTheme := themes.LoadTheme(theme)
-		color = selectedTheme
+		color = style.CheckHex(map[string]string{
+			"Title":      selectedTheme.Title,
+			"Text":       selectedTheme.Text,
+			"Background": selectedTheme.Background,
+			"Border":     selectedTheme.Border,
+			"Box":        selectedTheme.Box,
+			"Font":       selectedTheme.Font,
+		})
+		color.Name = selectedTheme.Name
 	} else {
 		styles := map[string]string{
 			"Title":      c.Request.FormValue("titlecolor"),
@@ -162,7 +170,15 @@ func language(c *gin.Context) {
 
 	if len(theme) > 0 {
 		selectedTheme := themes.LoadTheme(theme)
-		color = selectedTheme
+		color = style.CheckHex(map[string]string{
+			"Title":      selectedTheme.Title,
+			"Text":       selectedTheme.Text,
+			"Background": selectedTheme.Background,
+			"Border":     selectedTheme.Border,
+			"Box":        selectedTheme.Box,
+			"Font":       selectedTheme.Font,
+		})
+		color.Name = selectedTheme.Name
 	} else {
 		styles := map[string]string{
 			"Title":      c.Request.FormValue("titlecolor"),
@@ -186,7 +202,15 @@ func rankList(c *gin.Context) {
 
 	if len(theme) > 0 {
 		selectedTheme := themes.LoadTheme(theme)
-		color = selectedTheme
+		color = style.CheckHex(map[string]string{
+			"Title":      selectedTheme.Title,
+			"Text":       selectedTheme.Text,
+			"Background": selectedTheme.Background,
+			"Border":     selectedTheme.Border,
+			"Box":        selectedTheme.Box,
+			"Font":       selectedTheme.Font,
+		})
+		color.Name = selectedTheme.Name
 	} else {
 		styles := map[string]string{
 			"Title":      c.Request.FormValue("titlecolor"),
@@ -208,7 +232,15 @@ func userstreak(c *gin.Context) {
 
 	if len(theme) > 0 {
 		selectedTheme := themes.LoadTheme(theme)
-		color = selectedTheme
+		color = style.CheckHex(map[string]string{
+			"Title":      selectedTheme.Title,
+			"Text":       selectedTheme.Text,
+			"Background": selectedTheme.Background,
+			"Border":     selectedTheme.Border,
+			"Box":        selectedTheme.Box,
+			"Font":       selectedTheme.Font,
+		})
+		color.Name = selectedTheme.Name
 	} else {
 		styles := map[string]string{
 			"Title":      c.Request.FormValue("titlecolor"),
@@ -231,7 +263,15 @@ func getSkills(c *gin.Context) {
 
 	if len(theme) > 0 {
 		selectedTheme := themes.LoadTheme(theme)
-		color = selectedTheme
+		color = style.CheckHex(map[string]string{
+			"Title":      selectedTheme.Title,
+			"Text":       selectedTheme.Text,
+			"Background": selectedTheme.Background,
+			"Border":     selectedTheme.Border,
+			"Box":        selectedTheme.Box,
+			"Font":       selectedTheme.Font,
+		})
+		color.Name = selectedTheme.Name
 	} else {
 		styles := map[string]string{
 			"Title":      c.Request.FormValue("titlecolor"),
