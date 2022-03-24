@@ -36,5 +36,14 @@
     "title": "#ffffff",
     "border": "#333333",
     "background": "url(#retro)"
+  },
+  {
+    "name": "vue-dark",
+    "title": "#41b883",
+    "text": "#fffefe",
+    "background": "#273849",
+    "border": "#333333",
+    "box": "#333333",
+    "font": "Helvetica"
   }
 ]

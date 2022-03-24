@@ -3,6 +3,7 @@ package style
 import (
 	"fmt"
 	"githubembedapi/card/themes"
+	"math"
 	"regexp"
 	"strings"
 )
@@ -61,8 +62,18 @@ func RadialGradient(id string, colors []string) string {
 	return strings.Join(gradient, "\n")
 }
 func LinearGradient(id string, degree int, colors []string) string {
+
+	// Calculate rotation
+	anglePI := float64(degree) * (math.Pi / 180)
+	angleCoords := map[string]string{
+		"x1": fmt.Sprintf("%v%v", math.Round(50+math.Sin(anglePI)*50), "%"),
+		"y1": fmt.Sprintf("%v%v", math.Round(50+math.Cos(anglePI)*50), "%"),
+		"x2": fmt.Sprintf("%v%v", math.Round(50+math.Sin(anglePI+math.Pi)*50), "%"),
+		"y2": fmt.Sprintf("%v%v", math.Round(50+math.Cos(anglePI+math.Pi)*50), "%"),
+	}
 	gradient := []string{
-		fmt.Sprintf(`<linearGradient x="0" y="0" id="%v" gradientUnits="userSpaceOnUse" gradientTransform="rotate(%v)">`, id, degree),
+		fmt.Sprintf(`<linearGradient x1="%v" y1="%v" x2="%v" y2="%v" id="%v" gradientUnits="userSpaceOnUse">`,
+			angleCoords["x1"], angleCoords["y1"], angleCoords["x2"], angleCoords["y2"], id),
 	}
 	if cap(colors) < 2 {
 		panic(`Gradient must have 2 colors`)
@@ -112,7 +123,6 @@ func WavyFilter() string {
 		<animate attributeName="baseFrequency" dur="30s" values="0.01;0.005;0.02;0.009" repeatCount="indefinite" />
 		</feTurbulence>
 		<feDisplacementMap in="SourceGraphic" scale="20" />
-		
 	</filter>"
 	`
 }

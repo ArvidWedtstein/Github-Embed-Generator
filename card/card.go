@@ -474,21 +474,10 @@ func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, h
 	var card Card
 	card.Style = cardstyle
 
-	// Calculate rotation
-	/*
-		// Rotation can be 0 to 360
-		var anglePI = (angle) * (Math.PI / 180);
-		var angleCoords = {
-		    'x1': Math.round(50 + Math.sin(anglePI) * 50) + '%',
-		    'y1': Math.round(50 + Math.cos(anglePI) * 50) + '%',
-		    'x2': Math.round(50 + Math.sin(anglePI + Math.PI) * 50) + '%',
-		    'y2': Math.round(50 + Math.cos(anglePI + Math.PI) * 50) + '%',
-		}
-
-	*/
 	if cardstyle.Name == "retro" {
-		defs = append(defs, style.LinearGradient("retro", 0, []string{"#fc00ff", "#00dbde"}))
+		defs = append(defs, style.LinearGradient("retro", 180, []string{"#fc00ff", "#00dbde"}))
 	}
+
 	card.Body = []string{
 		fmt.Sprintf(`<svg width="%v" height="%v" viewBox="0 0 %v %v" xmlns="http://www.w3.org/2000/svg">`, width, height, width, height),
 		card.GetStyles(customStyles...),
