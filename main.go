@@ -25,7 +25,7 @@ func main() {
 	router.StaticFile("/.env", "/.env")
 	router.GET("/ranklist", rankList)
 	router.GET("/skills", getSkills)
-	router.GET("/mostactivity", getMostactivity)
+	// router.GET("/mostactivity", getMostactivity)
 	router.GET("/project", projectcard)
 	router.GET("/commitactivity", repositoryCommitActivity)
 	router.GET("/streak", userstreak)

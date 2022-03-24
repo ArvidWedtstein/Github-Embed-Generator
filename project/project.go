@@ -1,7 +1,6 @@
 package project
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"githubembedapi/card"
@@ -9,7 +8,6 @@ import (
 	"githubembedapi/card/themes"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -76,59 +74,59 @@ func Project(user, project string, cardstyle themes.Theme) string {
 
 	apiurl := "https://api.github.com/repos/" + user + "/" + project + "/stats/contributors"
 
-	jsonData := map[string]string{
-		"query": fmt.Sprintf(`
-		{
-			repository(owner: "%v", name: "%v") {
-				defaultBranchRef {
-				  name
-				  target {
-					... on Commit {
-					  id
-					  history(first: 100) {
-						nodes {
-						  oid
-						  message
-						  additions
-						  deletions
-						  changedFiles
-						}
-					  }
-					}
-				  }
-				}
-			  }
-		`, user, project),
-	}
+	// jsonData := map[string]string{
+	// 	"query": fmt.Sprintf(`
+	// 	{
+	// 		repository(owner: "%v", name: "%v") {
+	// 			defaultBranchRef {
+	// 			  name
+	// 			  target {
+	// 				... on Commit {
+	// 				  id
+	// 				  history(first: 100) {
+	// 					nodes {
+	// 					  oid
+	// 					  message
+	// 					  additions
+	// 					  deletions
+	// 					  changedFiles
+	// 					}
+	// 				  }
+	// 				}
+	// 			  }
+	// 			}
+	// 		  }
+	// 	`, user, project),
+	// }
 
-	jsonValue, _ := json.Marshal(jsonData)
+	// jsonValue, _ := json.Marshal(jsonData)
 
-	request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("GITHUB_TOKEN")))
-	if err != nil {
-		panic(fmt.Sprintf("Request Failed. Error: %v", err))
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-	response, err := client.Do(request)
-	if err != nil {
-		fmt.Printf("Request Failed. Error: %v", err)
-	}
-	defer response.Body.Close()
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		panic(err)
-	}
-	var data CommitHistory
-	json.Unmarshal(responseData, &data)
+	// request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
+	// request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("GITHUB_TOKEN")))
+	// if err != nil {
+	// 	panic(fmt.Sprintf("Request Failed. Error: %v", err))
+	// }
+	// client := &http.Client{Timeout: time.Second * 10}
+	// response, err := client.Do(request)
+	// if err != nil {
+	// 	fmt.Printf("Request Failed. Error: %v", err)
+	// }
+	// defer response.Body.Close()
+	// responseData, err := ioutil.ReadAll(response.Body)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// var data CommitHistory
+	// json.Unmarshal(responseData, &data)
 
-	additionsList := []int{}
-	deletionsList := []int{}
-	fileschanged := []int{}
-	for _, v := range data.Data.Repository.DefaultBranchRef.Target.History.Nodes {
-		additionsList = append(additionsList, v.Additions)
-		deletionsList = append(deletionsList, v.Deletions)
-		fileschanged = append(fileschanged, v.ChangedFiles)
-	}
+	// additionsList := []int{}
+	// deletionsList := []int{}
+	// fileschanged := []int{}
+	// for _, v := range data.Data.Repository.DefaultBranchRef.Target.History.Nodes {
+	// 	additionsList = append(additionsList, v.Additions)
+	// 	deletionsList = append(deletionsList, v.Deletions)
+	// 	fileschanged = append(fileschanged, v.ChangedFiles)
+	// }
 
 	/* old */
 	reqAPI, err := http.NewRequest("GET", apiurl, nil)
@@ -156,19 +154,24 @@ func Project(user, project string, cardstyle themes.Theme) string {
 	tm := time.Unix(i, 0)
 	_, week := tm.ISOWeek()
 
-	additions := resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Additions
-	deletions := resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Deletions
-	commits := resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Commits
+	var additions int
+	var deletions int
+	var commits int
+	for _, v := range resObjectAPI {
+		additions += v.Weeks[len(resObjectAPI[0].Weeks)-1].Additions
+		deletions += v.Weeks[len(resObjectAPI[0].Weeks)-1].Deletions
+		commits += v.Weeks[len(resObjectAPI[0].Weeks)-1].Commits
+	}
 
 	customstyles := []string{
 		`.circle {
 		transform: rotate(-90deg);
 		}`,
-		`.rank-circle-rim {
-			stroke: #333333;
+		fmt.Sprintf(`.rank-circle-rim {
+			stroke: %v;
 			fill: none;
 			opacity: 0.4;	
-		}`,
+		}`, cardstyle.Colors.Box),
 	}
 
 	defs := []string{
@@ -176,7 +179,6 @@ func Project(user, project string, cardstyle themes.Theme) string {
 		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
 		// style.StarsFilter(),
 		style.DropShadowRing1(),
-		// style.CubePattern(),
 	}
 	paddingX := 30
 	paddingY := 30
@@ -204,18 +206,16 @@ func Project(user, project string, cardstyle themes.Theme) string {
 		`<g data-testid="card-text">`,
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v Stats</text>`, paddingX, paddingY, card.ToTitleCase(project)),
 		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, paddingX),
-		fmt.Sprintf(`<text x="%v" y="130" id="Average" class="text">Average: %v</text>`, paddingX, goal),
-		// fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
-		// fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
-		// fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
-		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.Average(additionsList), "%"),
-		fmt.Sprintf(`<text x="%v" y="170" id="FilesChanged" class="text">Files Changed: %v%v🟥</text>`, paddingX, card.Average(fileschanged), "%"),
-		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Deletions: %v%v🟥</text>`, paddingX, card.Average(deletionsList), "%"),
+		fmt.Sprintf(`<text x="%v" y="130" id="Average" class="text">Goal: %v</text>`, paddingX, goal),
+		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
+		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
+		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
 		fmt.Sprintf(`<text x="%v" y="230" id="Week" class="text">Week: %v</text>`, paddingX, week),
 		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(additions, goal), "%"),
 		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(deletions, goal), "%"),
 		fmt.Sprintf(`<text x="440" y="170" id="Deletions" class="text">Com: %v%v</text>`, card.CalculatePercent(commits, goal), "%"),
 		`</g>`,
 	}
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 300, customstyles...), "\n")
+
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 290, customstyles...), "\n")
 }

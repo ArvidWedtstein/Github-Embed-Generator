@@ -47,9 +47,10 @@
     "name": "retro",
     "colors": {
       "title": "#ffffff",
+      "text": "#fffefe",
       "border": "#333333",
       "background": "url(#retro)",
-      "box": "#e25822"
+      "box": "url(#sunGradient)"
     }
   },
   {

@@ -474,6 +474,8 @@ func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, h
 	var card Card
 	card.Style = cardstyle
 	if cardstyle.Name == "retro" {
+		// body = append([]string{style.RetroGrid()}, body...)
+		defs = append(defs, style.SunGradient())
 		defs = append(defs, style.LinearGradient("retro", 180, []string{"#fc00ff", "#00dbde"}))
 	}
 	if cardstyle.Name == "rgb" {
@@ -519,6 +521,9 @@ func Sum(list []int) int {
 	return total
 }
 func Average(list []int) int {
+	if len(list) < 1 {
+		return 0
+	}
 	return Sum(list) / len(list)
 }
 func DegreeToRadians(degree float64) float64 {
