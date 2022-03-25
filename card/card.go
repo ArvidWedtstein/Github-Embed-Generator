@@ -476,13 +476,26 @@ func GetProgressAnimation(progress, radius int) string {
 func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, height int, customStyles ...string) []string {
 	var card Card
 	card.Style = cardstyle
+
+	/**
+		TODO
+		-------------
+		Make some kind of system for handling gradients
+	**/
 	if cardstyle.Name == "retro" {
-		// body = append([]string{style.RetroGrid()}, body...)
 		defs = append(defs, style.SunGradient())
 		defs = append(defs, style.LinearGradient("retro", 180, []string{"#fc00ff", "#00dbde"}))
 	}
 	if cardstyle.Name == "rgb" {
 		defs = append(defs, style.LinearGradient("rgb", 180, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}))
+	}
+	if cardstyle.Name == "ig9te" {
+		defs = append(defs, style.SunGradient())
+		defs = append(defs, style.LinearGradient("ig9te", -90, []string{"#8801ee", "#ff6a00"}))
+	}
+	if cardstyle.Name == "red" {
+		defs = append(defs, style.LinearGradient("redgrad", -90, []string{"#c31432", "#240b36"}))
+		defs = append(defs, style.LinearGradient("fire", 0, []string{"#f12711", "#f5af19"}))
 	}
 
 	card.Body = []string{

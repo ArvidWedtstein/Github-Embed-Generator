@@ -65,6 +65,37 @@
     "font": "Helvetica"
   },
   {
+    "name": "ig9te",
+    "colors": {
+      "title": "#ffffff",
+      "text": "#ffffff",
+      "background": "url(#ig9te)",
+      "border": "#ffffff",
+      "box": "url(#sunGradient)"
+    },
+    "font": "Helvetica"
+  },
+  {
+    "name": "github",
+    "colors": {
+      "title": "#ffffff",
+      "text": "#dddddd",
+      "background": "#0D1117",
+      "border": "#0D1117",
+      "box": "#0D1117"
+    }
+  },
+  {
+    "name": "red",
+    "colors": {
+      "title": "#ffffff",
+      "text": "#dddddd",
+      "background": "url(#redgrad)",
+      "border": "#0D1117",
+      "box": "url(#fire)"
+    }
+  },
+  {
     "name": "toringe",
     "colors": {
       "title": "",

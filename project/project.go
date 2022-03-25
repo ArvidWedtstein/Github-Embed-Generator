@@ -1,6 +1,7 @@
 package project
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"githubembedapi/card"
@@ -8,7 +9,7 @@ import (
 	"githubembedapi/card/themes"
 	"io/ioutil"
 	"net/http"
-	"strconv"
+	"os"
 	"strings"
 	"time"
 )
@@ -44,23 +45,32 @@ type ProjectActivity []struct {
 }
 type CommitHistory struct {
 	Data struct {
-		Repository struct {
-			DefaultBranchRef struct {
-				Name   string `json:"name"`
-				Target struct {
-					ID      string `json:"id"`
-					History struct {
-						Nodes []struct {
-							Oid          string `json:"oid"`
-							Message      string `json:"message"`
-							Additions    int    `json:"additions"`
-							Deletions    int    `json:"deletions"`
-							ChangedFiles int    `json:"changedFiles"`
-						} `json:"nodes"`
-					} `json:"history"`
-				} `json:"target"`
-			} `json:"defaultBranchRef"`
-		} `json:"repository"`
+		User struct {
+			Followers struct {
+				TotalCount int `json:"totalCount"`
+			} `json:"followers"`
+			Name       string `json:"name"`
+			Repository struct {
+				CreatedAt        time.Time `json:"createdAt"`
+				DefaultBranchRef struct {
+					Name   string `json:"name"`
+					Target struct {
+						Repository struct {
+							Name string `json:"name"`
+						} `json:"repository"`
+						History struct {
+							Nodes []struct {
+								Additions    int       `json:"additions"`
+								ChangedFiles int       `json:"changedFiles"`
+								Deletions    int       `json:"deletions"`
+								PushedDate   time.Time `json:"pushedDate"`
+							} `json:"nodes"`
+							TotalCount int `json:"totalCount"`
+						} `json:"history"`
+					} `json:"target"`
+				} `json:"defaultBranchRef"`
+			} `json:"repository"`
+		} `json:"user"`
 	} `json:"data"`
 }
 
@@ -72,96 +82,105 @@ func recoverFromError() {
 func Project(user, project string, cardstyle themes.Theme) string {
 	goal := 1000
 
-	apiurl := "https://api.github.com/repos/" + user + "/" + project + "/stats/contributors"
+	// apiurl := "https://api.github.com/repos/" + user + "/" + project + "/stats/contributors"
 
-	// jsonData := map[string]string{
-	// 	"query": fmt.Sprintf(`
-	// 	{
-	// 		repository(owner: "%v", name: "%v") {
-	// 			defaultBranchRef {
-	// 			  name
-	// 			  target {
-	// 				... on Commit {
-	// 				  id
-	// 				  history(first: 100) {
-	// 					nodes {
-	// 					  oid
-	// 					  message
-	// 					  additions
-	// 					  deletions
-	// 					  changedFiles
-	// 					}
-	// 				  }
-	// 				}
-	// 			  }
-	// 			}
-	// 		  }
-	// 	`, user, project),
-	// }
-
-	// jsonValue, _ := json.Marshal(jsonData)
-
-	// request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
-	// request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("GITHUB_TOKEN")))
-	// if err != nil {
-	// 	panic(fmt.Sprintf("Request Failed. Error: %v", err))
-	// }
-	// client := &http.Client{Timeout: time.Second * 10}
-	// response, err := client.Do(request)
-	// if err != nil {
-	// 	fmt.Printf("Request Failed. Error: %v", err)
-	// }
-	// defer response.Body.Close()
-	// responseData, err := ioutil.ReadAll(response.Body)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// var data CommitHistory
-	// json.Unmarshal(responseData, &data)
-
-	// additionsList := []int{}
-	// deletionsList := []int{}
-	// fileschanged := []int{}
-	// for _, v := range data.Data.Repository.DefaultBranchRef.Target.History.Nodes {
-	// 	additionsList = append(additionsList, v.Additions)
-	// 	deletionsList = append(deletionsList, v.Deletions)
-	// 	fileschanged = append(fileschanged, v.ChangedFiles)
-	// }
-
-	/* old */
-	reqAPI, err := http.NewRequest("GET", apiurl, nil)
-	if err != nil {
-		panic(err.Error())
+	hour, min, sec := time.Now().Clock()
+	year, month, day := time.Now().Date()
+	jsonData := map[string]string{
+		"query": fmt.Sprintf(`
+		{
+			user(login: "%v") {
+				followers {
+				  	totalCount
+				}
+				name
+				repository(name: "%v") {
+				  	defaultBranchRef {
+						name
+						target {
+					  		... on Commit {
+								history(until: "%v-%02d-%02dT%02d:%02d:%02dZ") {
+									nodes {
+										additions
+										changedFiles
+										deletions
+										pushedDate
+									}
+								}
+					  		}
+						}
+				  	}
+				}
+			}
+		}
+		`, user, project, year, int(month), day, hour, min, sec),
 	}
-	clientAPI := &http.Client{}
+	jsonValue, _ := json.Marshal(jsonData)
 
-	responseAPI, err := clientAPI.Do(reqAPI)
-	defer recoverFromError()
+	// Make new request
+	request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("GITHUB_TOKEN")))
 	if err != nil {
-		panic(err.Error())
+		panic(fmt.Sprintf("Request Failed. Error: %v", err))
 	}
-	defer responseAPI.Body.Close()
 
-	responseDataAPI, err := ioutil.ReadAll(responseAPI.Body)
+	client := &http.Client{Timeout: time.Second * 10}
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Printf("Request Failed. Error: %v", err)
+	}
+	defer response.Body.Close()
+	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		panic(err)
 	}
+	var data CommitHistory
+	json.Unmarshal(responseData, &data)
 
-	var resObjectAPI ProjectActivity
-	json.Unmarshal(responseDataAPI, &resObjectAPI)
+	additionsList := []int{}
+	deletionsList := []int{}
+	// fileschanged := []int{}
 
-	i, _ := strconv.ParseInt(strconv.Itoa(resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Week), 10, 64)
-	tm := time.Unix(i, 0)
-	_, week := tm.ISOWeek()
-
-	var additions int
-	var deletions int
-	var commits int
-	for _, v := range resObjectAPI {
-		additions += v.Weeks[len(resObjectAPI[0].Weeks)-1].Additions
-		deletions += v.Weeks[len(resObjectAPI[0].Weeks)-1].Deletions
-		commits += v.Weeks[len(resObjectAPI[0].Weeks)-1].Commits
+	for _, v := range data.Data.User.Repository.DefaultBranchRef.Target.History.Nodes {
+		additionsList = append(additionsList, v.Additions)
+		deletionsList = append(deletionsList, v.Deletions)
+		// fileschanged = append(fileschanged, v.ChangedFiles)
 	}
+
+	/* old */
+	// reqAPI, err := http.NewRequest("GET", apiurl, nil)
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// clientAPI := &http.Client{}
+
+	// responseAPI, err := clientAPI.Do(reqAPI)
+	// defer recoverFromError()
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// defer responseAPI.Body.Close()
+
+	// responseDataAPI, err := ioutil.ReadAll(responseAPI.Body)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// var resObjectAPI ProjectActivity
+	// json.Unmarshal(responseDataAPI, &resObjectAPI)
+
+	// i, _ := strconv.ParseInt(strconv.Itoa(resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Week), 10, 64)
+	// tm := time.Unix(i, 0)
+	// _, week := tm.ISOWeek()
+
+	// var additions int
+	// var deletions int
+	// var commits int
+	// for _, v := range resObjectAPI {
+	// 	additions += v.Weeks[len(resObjectAPI[0].Weeks)-1].Additions
+	// 	deletions += v.Weeks[len(resObjectAPI[0].Weeks)-1].Deletions
+	// 	commits += v.Weeks[len(resObjectAPI[0].Weeks)-1].Commits
+	// }
 
 	customstyles := []string{
 		`.circle {
@@ -177,18 +196,22 @@ func Project(user, project string, cardstyle themes.Theme) string {
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),
 		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),
-		// style.StarsFilter(),
 		style.DropShadowRing1(),
 	}
 	paddingX := 30
 	paddingY := 30
 
-	prog1, style1 := card.CircleProgressbar(card.CalculatePercent(additions, goal), 80, 10, 0, 0, "#39d353", "circle")
-	prog2, style2 := card.CircleProgressbar(card.CalculatePercent(deletions, goal), 70, 10, 0, 0, "red", "circle")
-	prog3, style3 := card.CircleProgressbar(card.CalculatePercent(commits, goal), 60, 10, 0, 0, "blue", "circle")
+	card.Sum(additionsList)
+	prog1, style1 := card.CircleProgressbar(card.CalculatePercent(card.Average(additionsList), goal), 80, 10, 0, 0, "#39d353", "circle")
+	prog2, style2 := card.CircleProgressbar(card.CalculatePercent(card.Average(deletionsList), goal), 70, 10, 0, 0, "red", "circle")
+	// prog1, style1 := card.CircleProgressbar(card.CalculatePercent(additions, goal), 80, 10, 0, 0, "#39d353", "circle")
+	// prog2, style2 := card.CircleProgressbar(card.CalculatePercent(deletions, goal), 70, 10, 0, 0, "red", "circle")
+	// prog3, style3 := card.CircleProgressbar(card.CalculatePercent(commits, goal), 60, 10, 0, 0, "blue", "circle")
+	// customstyles = append(customstyles, style1)
+	// customstyles = append(customstyles, style2)
+	// customstyles = append(customstyles, style3)
 	customstyles = append(customstyles, style1)
 	customstyles = append(customstyles, style2)
-	customstyles = append(customstyles, style3)
 
 	body := []string{
 		`<g id="Box">`,
@@ -200,20 +223,25 @@ func Project(user, project string, cardstyle themes.Theme) string {
 		`<g id="Stat" transform="translate(480,145)">`,
 		prog1,
 		prog2,
-		prog3,
+		// prog3,
 
 		`</g>`,
 		`<g data-testid="card-text">`,
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v Stats</text>`, paddingX, paddingY, card.ToTitleCase(project)),
 		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, paddingX),
 		fmt.Sprintf(`<text x="%v" y="130" id="Average" class="text">Goal: %v</text>`, paddingX, goal),
-		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
-		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
-		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
-		fmt.Sprintf(`<text x="%v" y="230" id="Week" class="text">Week: %v</text>`, paddingX, week),
-		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(additions, goal), "%"),
-		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(deletions, goal), "%"),
-		fmt.Sprintf(`<text x="440" y="170" id="Deletions" class="text">Com: %v%v</text>`, card.CalculatePercent(commits, goal), "%"),
+		// fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
+		// fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
+		// fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
+		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(card.Average(additionsList), goal), "%"),
+		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(card.Average(deletionsList), goal), "%"),
+		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, data.Data.User.Repository.DefaultBranchRef.Target.History.TotalCount),
+		// fmt.Sprintf(`<text x="%v" y="230" id="Week" class="text">Week: %v</text>`, paddingX, week),
+		// fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(additions, goal), "%"),
+		// fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(deletions, goal), "%"),
+		// fmt.Sprintf(`<text x="440" y="170" id="Deletions" class="text">Com: %v%v</text>`, card.CalculatePercent(commits, goal), "%"),
+		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(card.Average(additionsList), goal), "%"),
+		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(card.Average(deletionsList), goal), "%"),
 		`</g>`,
 	}
 
