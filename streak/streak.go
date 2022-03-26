@@ -202,11 +202,6 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 		`fill: none;`,
 		fmt.Sprintf(`stroke: %v;`, cardstyle.Colors.Box),
 		`}`,
-		`.box {
-			fill: ` + cardstyle.Colors.Background + `;
-			stroke: ` + cardstyle.Colors.Border + `;
-			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
-		}`,
 		fmt.Sprintf(`.streaktxt {
 			font-size: 40px;
 			font-family: Helvetica;

@@ -6,7 +6,6 @@ import (
 	"githubembedapi/card/style"
 	"githubembedapi/card/themes"
 	"githubembedapi/icons"
-	"strconv"
 	"strings"
 )
 
@@ -27,8 +26,6 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
 		`.languagebox { 
 			fill: ` + cardstyle.Colors.Box + `;
-			stroke: ` + cardstyle.Colors.Border + `;
-			stroke-width: ` + strconv.Itoa(strokewidth) + `;
 		}`,
 	}
 	defs := []string{

@@ -511,7 +511,7 @@ func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, h
 			stroke-width: `+strconv.Itoa(strokewidth)+`px;
 		}
 		`)
-		card.Body = append(card.Body, card.GetStyles(customStyles...), fmt.Sprintf(`<rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width, height))
+		card.Body = append(card.Body, card.GetStyles(customStyles...), fmt.Sprintf(`<rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width-strokewidth, height-strokewidth))
 	}
 
 	card.Body = append(card.Body, strings.Join(body, "\n"), `</svg>`)
