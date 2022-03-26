@@ -82,8 +82,6 @@ func recoverFromError() {
 func Project(user, project string, cardstyle themes.Theme) string {
 	goal := 1000
 
-	// apiurl := "https://api.github.com/repos/" + user + "/" + project + "/stats/contributors"
-
 	hour, min, sec := time.Now().Clock()
 	year, month, day := time.Now().Date()
 	jsonData := map[string]string{
@@ -139,48 +137,11 @@ func Project(user, project string, cardstyle themes.Theme) string {
 
 	additionsList := []int{}
 	deletionsList := []int{}
-	// fileschanged := []int{}
 
 	for _, v := range data.Data.User.Repository.DefaultBranchRef.Target.History.Nodes {
 		additionsList = append(additionsList, v.Additions)
 		deletionsList = append(deletionsList, v.Deletions)
-		// fileschanged = append(fileschanged, v.ChangedFiles)
 	}
-
-	/* old */
-	// reqAPI, err := http.NewRequest("GET", apiurl, nil)
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-	// clientAPI := &http.Client{}
-
-	// responseAPI, err := clientAPI.Do(reqAPI)
-	// defer recoverFromError()
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-	// defer responseAPI.Body.Close()
-
-	// responseDataAPI, err := ioutil.ReadAll(responseAPI.Body)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// var resObjectAPI ProjectActivity
-	// json.Unmarshal(responseDataAPI, &resObjectAPI)
-
-	// i, _ := strconv.ParseInt(strconv.Itoa(resObjectAPI[0].Weeks[len(resObjectAPI[0].Weeks)-1].Week), 10, 64)
-	// tm := time.Unix(i, 0)
-	// _, week := tm.ISOWeek()
-
-	// var additions int
-	// var deletions int
-	// var commits int
-	// for _, v := range resObjectAPI {
-	// 	additions += v.Weeks[len(resObjectAPI[0].Weeks)-1].Additions
-	// 	deletions += v.Weeks[len(resObjectAPI[0].Weeks)-1].Deletions
-	// 	commits += v.Weeks[len(resObjectAPI[0].Weeks)-1].Commits
-	// }
 
 	customstyles := []string{
 		`.circle {
@@ -204,12 +165,6 @@ func Project(user, project string, cardstyle themes.Theme) string {
 	card.Sum(additionsList)
 	prog1, style1 := card.CircleProgressbar(card.CalculatePercent(card.Average(additionsList), goal), 80, 10, 0, 0, "#39d353", "circle")
 	prog2, style2 := card.CircleProgressbar(card.CalculatePercent(card.Average(deletionsList), goal), 70, 10, 0, 0, "red", "circle")
-	// prog1, style1 := card.CircleProgressbar(card.CalculatePercent(additions, goal), 80, 10, 0, 0, "#39d353", "circle")
-	// prog2, style2 := card.CircleProgressbar(card.CalculatePercent(deletions, goal), 70, 10, 0, 0, "red", "circle")
-	// prog3, style3 := card.CircleProgressbar(card.CalculatePercent(commits, goal), 60, 10, 0, 0, "blue", "circle")
-	// customstyles = append(customstyles, style1)
-	// customstyles = append(customstyles, style2)
-	// customstyles = append(customstyles, style3)
 	customstyles = append(customstyles, style1)
 	customstyles = append(customstyles, style2)
 
@@ -223,23 +178,14 @@ func Project(user, project string, cardstyle themes.Theme) string {
 		`<g id="Stat" transform="translate(480,145)">`,
 		prog1,
 		prog2,
-		// prog3,
-
 		`</g>`,
 		`<g data-testid="card-text">`,
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v Stats</text>`, paddingX, paddingY, card.ToTitleCase(project)),
 		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, paddingX),
 		fmt.Sprintf(`<text x="%v" y="130" id="Average" class="text">Goal: %v</text>`, paddingX, goal),
-		// fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(additions, goal), "%"),
-		// fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(deletions, goal), "%"),
-		// fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, commits),
 		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(card.Average(additionsList), goal), "%"),
 		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(card.Average(deletionsList), goal), "%"),
 		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, data.Data.User.Repository.DefaultBranchRef.Target.History.TotalCount),
-		// fmt.Sprintf(`<text x="%v" y="230" id="Week" class="text">Week: %v</text>`, paddingX, week),
-		// fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(additions, goal), "%"),
-		// fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(deletions, goal), "%"),
-		// fmt.Sprintf(`<text x="440" y="170" id="Deletions" class="text">Com: %v%v</text>`, card.CalculatePercent(commits, goal), "%"),
 		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(card.Average(additionsList), goal), "%"),
 		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(card.Average(deletionsList), goal), "%"),
 		`</g>`,

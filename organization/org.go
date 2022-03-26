@@ -182,12 +182,6 @@ func MostactivityCard(title, org string, cardstyle themes.Theme) string {
 		}`,
 		`.repobox:hover { fill: rgba(255,0,0,0.8);}`,
 		`.repobox:hover rect {filter: blur(30px);}`,
-		`.box {
-			fill: ` + cardstyle.Colors.Background + `;
-			border: 3px solid ` + cardstyle.Colors.Border + `;
-			stroke: ` + cardstyle.Colors.Border + `;
-			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
-		}`,
 	}
 	defs := []string{
 		style.LinearGradient("gradient-fill", 0, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}),

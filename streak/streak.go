@@ -251,6 +251,7 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 
 	tstart := stats.LongestStreak.Start.Format("Jan 2, 2006")
 	tend := stats.LongestStreak.End.Format("Jan 2, 2006")
+	bodyAdd(`<g>`)
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Longest Streak</text>`, (width/2)+130, (height/2)-30))
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)+130, (height/2)+5, stats.LongestStreak.Length))
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="datetxt text">%v - %v</text>`, (width/2)+130, (height/2)+20, tstart, tend))

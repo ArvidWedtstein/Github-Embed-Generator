@@ -13,7 +13,7 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 	if title == "" || len(title) <= 0 {
 		title = "Skills"
 	}
-	fmt.Println(cardstyle.Colors.Title)
+
 	height := 700
 	width := 600
 	titleboxheight := 50
