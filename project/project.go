@@ -245,5 +245,5 @@ func Project(user, project string, cardstyle themes.Theme) string {
 		`</g>`,
 	}
 
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 290, customstyles...), "\n")
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 290, false, customstyles...), "\n")
 }

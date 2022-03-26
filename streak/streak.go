@@ -227,9 +227,7 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 		style.WavyFilter(),
 	}
 
-	body := []string{
-		fmt.Sprintf(`<g><rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width, height),
-	}
+	body := []string{}
 
 	bodyAdd := func(content string) string {
 		body = append(body, content)
@@ -265,5 +263,5 @@ func Streak(user, hide_title string, cardstyle themes.Theme) string {
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="titletxt text">Total Contributions</text>`, (width/2)-120, (height/2)-30))
 	bodyAdd(fmt.Sprintf(`<text x="%v" y="%v" text-anchor="middle" class="mediantxt text">%v</text>`, (width/2)-130, (height/2)+5, stats.TotalContributions))
 	bodyAdd(`</g>`)
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, customstyles...), "\n")
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, true, customstyles...), "\n")
 }

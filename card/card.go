@@ -473,7 +473,7 @@ func GetProgressAnimation(progress, radius int) string {
 		}
 	}`
 }
-func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, height int, customStyles ...string) []string {
+func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, height int, hasBox bool, customStyles ...string) []string {
 	var card Card
 	card.Style = cardstyle
 
@@ -500,11 +500,21 @@ func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, h
 
 	card.Body = []string{
 		fmt.Sprintf(`<svg width="%v" height="%v" viewBox="0 0 %v %v" xmlns="http://www.w3.org/2000/svg">`, width, height, width, height),
-		card.GetStyles(customStyles...),
 		card.GetDefs(defs),
-		strings.Join(body, "\n"),
-		`</svg>`,
 	}
+	strokewidth := 3
+	if hasBox {
+		customStyles = append(customStyles, `
+		.box {
+			fill: `+cardstyle.Colors.Background+`;
+			stroke: `+cardstyle.Colors.Border+`;
+			stroke-width: `+strconv.Itoa(strokewidth)+`px;
+		}
+		`)
+		card.Body = append(card.Body, card.GetStyles(customStyles...), fmt.Sprintf(`<rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width, height))
+	}
+
+	card.Body = append(card.Body, strings.Join(body, "\n"), `</svg>`)
 	return card.Body
 }
 

@@ -169,7 +169,6 @@ func LanguageCard(title, user, langs_count string, cardstyle themes.Theme, isOrg
 
 	padding := 30
 	body := []string{
-		fmt.Sprintf(`<g id="Box"><rect x="0" y="0" rx="15" fill="%v" width="%v" height="%v" /></g>`, cardstyle.Colors.Background, 800, 300),
 		`<g data-testid="card-text">`,
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v</text>`, padding, padding, card.ToTitleCase(title)),
 		fmt.Sprintf(`<line id="gradLine"  x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, padding),
@@ -231,5 +230,5 @@ func LanguageCard(title, user, langs_count string, cardstyle themes.Theme, isOrg
 	}
 	body = append(body, card.FlexBox(270, 20, 30, padding, content, false))
 	body = append(body, card.PieChart(slices, 60, 400, 150, "#ff0000"))
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 300, customstyles...), "\n")
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, 600, 300, true, customstyles...), "\n")
 }

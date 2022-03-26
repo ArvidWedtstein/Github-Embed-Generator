@@ -274,9 +274,8 @@ func MostactivityCard(title, org string, cardstyle themes.Theme) string {
 	}
 	bodyAdd(`</g>`)
 	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="#%v"/>`, titleboxheight, width, strokewidth, cardstyle.Colors.Border)}, body...)
-	body = append([]string{fmt.Sprintf(`<rect x="0" y="0" class="box" width="%v" height="%v" rx="15"  />`, width, height)}, body...)
 
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, width, height, customstyles...), "\n")
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, width, height, true, customstyles...), "\n")
 
 }
 func ToTitleCase(str string) string {

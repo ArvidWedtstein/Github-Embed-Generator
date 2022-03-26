@@ -48,7 +48,6 @@ func Rankcard(title string, users []string, cardstyle themes.Theme) string {
 		`.text { font: 20px sans-serif; fill: ` + cardstyle.Colors.Text + `; font-family: ` + cardstyle.Font + `; text-decoration: underline;}`,
 		`.large { font: 25px sans-serif; fill: black}`,
 		`.title { font: 25px sans-serif; fill: ` + cardstyle.Colors.Title + `}`,
-		`.box { fill: ` + cardstyle.Colors.Background + `}`,
 		`.profileimage { border-radius: 50%}`,
 	}
 	defs := []string{}
@@ -91,7 +90,6 @@ func Rankcard(title string, users []string, cardstyle themes.Theme) string {
 	strokewidth := 3
 
 	body := []string{
-		fmt.Sprintf(`<rect x="0" y="0" class="box" width="%v" height="200" rx="15" style="stroke-width:3;stroke:%v"/>`, width, cardstyle.Colors.Border),
 		fmt.Sprintf(`<rect x="0" y="30" width="%v" height="3" fill="%v"/>`, width, cardstyle.Colors.Border),
 		fmt.Sprintf(`<text x="20" y="25" class="title">%s</text>`, card.ToTitleCase(title)),
 	}
@@ -106,5 +104,5 @@ func Rankcard(title string, users []string, cardstyle themes.Theme) string {
 		body = append(body, text)
 		body = append(body, img)
 	}
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, totalHeight+180, customstyles...), "\n")
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, totalHeight+180, true, customstyles...), "\n")
 }

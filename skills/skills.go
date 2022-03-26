@@ -25,15 +25,10 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
-		`.repobox { 
+		`.languagebox { 
 			fill: ` + cardstyle.Colors.Box + `;
-			border: ` + strconv.Itoa(strokewidth) + `px solid #` + cardstyle.Colors.Border + `;
-		}`,
-		`.box {
-			fill: ` + cardstyle.Colors.Background + `;
-			border: 3px solid #` + cardstyle.Colors.Border + `;
 			stroke: ` + cardstyle.Colors.Border + `;
-			stroke-width: ` + strconv.Itoa(strokewidth) + `px;
+			stroke-width: ` + strconv.Itoa(strokewidth) + `;
 		}`,
 	}
 	defs := []string{
@@ -78,13 +73,12 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 
 	posX := 0
 
-	// imgsize := boxwidth - (padding * 2)
 	originalpos := posX
 	newwidth := width
 	newheight := height
 
 	row := func(content []string, lang string) {
-		bodyAdd(fmt.Sprintf(`<g class="repobox" title="%v" transform="translate(%v,%v) rotate(0)">`, lang, posX+padding, posY))
+		bodyAdd(fmt.Sprintf(`<g class="languagebox" title="%v" transform="translate(%v,%v) rotate(0)">`, lang, posX+padding, posY))
 
 		for _, v := range content {
 			bodyAdd(v)
@@ -100,7 +94,6 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 		}
 	}
 
-	// content := []string{}
 	for _, lang := range languages {
 
 		icon := icons.Icons(lang)
@@ -112,11 +105,10 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 		row([]string{
 			fmt.Sprintf(`<rect x="0" y="0" rx="5" class="" width="%v" height="%v" />`, boxwidth+(len(lang)*6), boxheight),
 			img,
-		}, strings.ToUpper(lang))
+		}, lang)
 
 		posX += (boxwidth + (len(lang) * 6)) + padding
 
-		// content = append(content, fmt.Sprintf(`<g>`))
 	}
 
 	// adjust the svg size to the content
@@ -129,7 +121,6 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 
 	// Line on top
 	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="%v"/>`, titleboxheight, width, strokewidth, cardstyle.Colors.Border)}, body...)
-	body = append([]string{fmt.Sprintf(`<rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width, height)}, body...)
 
-	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, customstyles...), "\n")
+	return strings.Join(card.GenerateCard(cardstyle, defs, body, width+strokewidth, height+strokewidth, true, customstyles...), "\n")
 }
