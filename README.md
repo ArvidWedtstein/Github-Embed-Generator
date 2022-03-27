@@ -68,3 +68,8 @@ Make sure your request is meaningful and you have tested the app locally before 
 # TODO
 
 - Repository Timeline?
+
+
+# Copilot
+
+https://github.com/github/copilot-docs/blob/main/docs/visualstudiocode/gettingstarted.md#getting-started-with-github-copilot-in-visual-studio-code

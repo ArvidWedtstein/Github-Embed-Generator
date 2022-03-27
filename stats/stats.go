@@ -145,22 +145,6 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 		title = "Stats"
 	}
 
-	// TODO
-	//
-	// Total Contributions - DONE
-	// Organizations Contributed To - DONE
-	// People Contributed To
-	// Repositories Contributed To - DONE
-	// Issue Count (Open issues only??)
-	// Disk Usage
-	// Stargazer Count
-	// Milestones Count
-	// Packages Count
-	// Fork Count
-	// Releases Count
-	// Watchers Count - DONE
-	// Pull Request Count - DONE
-
 	contributionsCollection := data.Data.User.ContributionsCollection
 	totalContributions := contributionsCollection.TotalCommitContributions
 
@@ -224,14 +208,26 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 	}
 
 	body := []string{
-		fmt.Sprintf(`<text x="20" y="35" class="title">%s</text>`, card.ToTitleCase(title)),
+		fmt.Sprintf(`<text x="20" y="35" class="title">%s</text>`, title),
 	}
 
-	bodyAdd := func(content string) string {
-		body = append(body, content)
-		return content
+	bodyAdd := func(content ...string) {
+		body = append(body, content...)
 	}
-	bodyAdd(`<g></g>`)
+	content := []string{}
+
+	content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Contributions: %v</text>`, titleboxheight+30, totalContributions))
+	content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Milestones: %v</text>`, titleboxheight+60, totalMilestones))
+	content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Packages: %v</text>`, titleboxheight+90, totalPackages))
+	content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Forks: %v</text>`, titleboxheight+120, totalForks))
+	content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Releases: %v</text>`, titleboxheight+150, totalReleases))
+	content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Watchers: %v</text>`, titleboxheight+180, totalWatchers))
+	content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Stars Earned: %v</text>`, titleboxheight+210, totalStargazers))
+	content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Disk Usage: %v</text>`, titleboxheight+240, totalDiskUsage))
+
+	bodyAdd(`<g>`)
+	bodyAdd(content...)
+	bodyAdd(`</g>`)
 
 	// Line on top
 	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="%v"/>`, titleboxheight, width, strokewidth, cardstyle.Colors.Border)}, body...)
