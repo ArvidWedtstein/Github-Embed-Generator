@@ -183,11 +183,11 @@ func Project(user, project string, cardstyle themes.Theme) string {
 		fmt.Sprintf(`<text x="%v" y="%v" id="Stats" class="title">%v Stats</text>`, paddingX, paddingY, card.ToTitleCase(project)),
 		fmt.Sprintf(`<line id="gradLine" x1="%v" y1="40" x2="400" y2="40" stroke="url(#paint0_angular_0_1)"/>`, paddingX),
 		fmt.Sprintf(`<text x="%v" y="130" id="Average" class="text">Goal: %v</text>`, paddingX, goal),
-		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%v🟩</text>`, paddingX, card.CalculatePercent(card.Average(additionsList), goal), "%"),
-		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%v🟥</text>`, paddingX, card.CalculatePercent(card.Average(deletionsList), goal), "%"),
+		fmt.Sprintf(`<text x="%v" y="150" id="Additions" class="text">Additions: %v%%🟩</text>`, paddingX, card.CalculatePercent(card.Average(additionsList), goal)),
+		fmt.Sprintf(`<text x="%v" y="170" id="Deletions" class="text">Deletions: %v%%🟥</text>`, paddingX, card.CalculatePercent(card.Average(deletionsList), goal)),
 		fmt.Sprintf(`<text x="%v" y="190" id="Commits" class="text">Commits: %v🟦</text>`, paddingX, data.Data.User.Repository.DefaultBranchRef.Target.History.TotalCount),
-		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%v</text>`, card.CalculatePercent(card.Average(additionsList), goal), "%"),
-		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%v</text>`, card.CalculatePercent(card.Average(deletionsList), goal), "%"),
+		fmt.Sprintf(`<text x="440" y="130" id="Additions" class="text">Add: %v%%</text>`, card.CalculatePercent(card.Average(additionsList), goal)),
+		fmt.Sprintf(`<text x="440" y="150" id="Deletions" class="text">Del: %v%%</text>`, card.CalculatePercent(card.Average(deletionsList), goal)),
 		`</g>`,
 	}
 

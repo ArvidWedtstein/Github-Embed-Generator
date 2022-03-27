@@ -44,18 +44,22 @@ type Data struct {
 					Watchers struct {
 						TotalCount int `json:"totalCount"`
 					} `json:"watchers"`
+					Issues struct {
+						TotalCount int `json:"totalCount"`
+					} `json:"issues"`
 				} `json:"nodes"`
 			} `json:"repositories"`
 			RepositoriesContributedTo struct {
 				Nodes []struct {
 					NameWithOwner string `json:"nameWithOwner"`
+					Owner         struct {
+						Login string `json:"login"`
+					} `json:"owner"`
+					IsInOrganization bool `json:"isInOrganization"`
 				} `json:"nodes"`
 				TotalCount int `json:"totalCount"`
 			} `json:"repositoriesContributedTo"`
 		} `json:"user"`
-		Search struct {
-			IssueCount int `json:"issueCount"`
-		} `json:"search"`
 	} `json:"data"`
 }
 
@@ -72,7 +76,7 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 					totalPullRequestContributions
 					totalPullRequestReviewContributions
                 }
-				repositories(last: 100, isFork: false, affiliations: OWNER) {
+				repositories(last: 100, isFork: false, affiliations: OWNER, privacy: PUBLIC) {
 					nodes {
 					  name
 					  stargazerCount
@@ -93,6 +97,9 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 					  watchers {
 						totalCount
 					  }
+					  issues {
+						  totalCount
+					  }
 					}
 				  }
 				repositoriesContributedTo(
@@ -101,15 +108,16 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 				  ) {
 					nodes {
 					  	nameWithOwner
+						owner {
+							login
+						}
+						isInOrganization
 					}
 					totalCount
 				}
             }
-			search(first: 100, type: ISSUE, query: "user:%v state:OPEN") {
-				issueCount
-			}
 		}
-		`, user, year, year, user),
+		`, user, year, year),
 	}
 
 	jsonValue, _ := json.Marshal(jsonData)
@@ -139,17 +147,69 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 
 	// TODO
 	//
-	// Organizations Contributed To
-	// Repositories Contributed To
+	// Total Contributions - DONE
+	// Organizations Contributed To - DONE
+	// People Contributed To
+	// Repositories Contributed To - DONE
 	// Issue Count (Open issues only??)
 	// Disk Usage
+	// Stargazer Count
 	// Milestones Count
 	// Packages Count
 	// Fork Count
 	// Releases Count
-	// Watchers Count
-	//
+	// Watchers Count - DONE
+	// Pull Request Count - DONE
 
+	contributionsCollection := data.Data.User.ContributionsCollection
+	totalContributions := contributionsCollection.TotalCommitContributions
+
+	totalContributions += contributionsCollection.TotalIssueContributions
+	totalContributions += contributionsCollection.TotalPullRequestContributions
+	totalContributions += contributionsCollection.TotalPullRequestReviewContributions
+	repositoriesContributedTo := data.Data.User.RepositoriesContributedTo.TotalCount
+
+	orgsContributedTo := []string{}
+	for _, v := range data.Data.User.RepositoriesContributedTo.Nodes {
+		if !card.ArrayContains(orgsContributedTo, v.Owner.Login) && v.IsInOrganization {
+			orgsContributedTo = append(orgsContributedTo, v.Owner.Login)
+		}
+	}
+	fmt.Printf("Repos Contributed To: %v\n", repositoriesContributedTo)
+	fmt.Printf("Orgs Contributed to: %v\n", len(orgsContributedTo))
+
+	totalMilestones := 0
+	totalPackages := 0
+	totalForks := 0
+	totalReleases := 0
+	totalWatchers := 0
+	totalStargazers := 0
+	totalDiskUsage := 0
+	totalPullRequests := 0
+	totalIssues := 0
+
+	for _, v := range data.Data.User.Repositories.Nodes {
+		totalMilestones += v.Milestones.TotalCount
+		totalPackages += v.Packages.TotalCount
+		totalForks += v.ForkCount
+		totalReleases += v.Releases.TotalCount
+		totalWatchers += v.Watchers.TotalCount
+		totalStargazers += v.StargazerCount
+		totalDiskUsage += v.DiskUsage
+		totalPullRequests += v.PullRequests.TotalCount
+		totalIssues += v.Issues.TotalCount
+	}
+
+	fmt.Printf("TotalContributions: %v\n", totalContributions)
+	fmt.Printf("totalMilestones: %v\n", totalMilestones)
+	fmt.Printf("totalPackages: %v\n", totalPackages)
+	fmt.Printf("totalForks: %v\n", totalForks)
+	fmt.Printf("totalReleases: %v\n", totalReleases)
+	fmt.Printf("totalWatchers: %v\n", totalWatchers)
+	fmt.Printf("totalStargazers: %v\n", totalStargazers)
+	fmt.Printf("totalDiskUsage: %v\n", totalDiskUsage)
+	fmt.Printf("totalPullRequests: %v\n", totalPullRequests)
+	fmt.Printf("totalIssues: %v\n", totalIssues)
 	height := 700
 	width := 600
 	titleboxheight := 50
@@ -171,12 +231,7 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 		body = append(body, content)
 		return content
 	}
-	bodyAdd(`<g>`)
-	contributionsCollection := data.Data.User.ContributionsCollection
-	totalContributions := contributionsCollection.TotalCommitContributions
-	totalContributions += contributionsCollection.TotalIssueContributions
-	totalContributions += contributionsCollection.TotalPullRequestContributions
-	totalContributions += contributionsCollection.TotalPullRequestReviewContributions
+	bodyAdd(`<g></g>`)
 
 	// Line on top
 	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="%v"/>`, titleboxheight, width, strokewidth, cardstyle.Colors.Border)}, body...)

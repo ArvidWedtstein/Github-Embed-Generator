@@ -49,7 +49,7 @@
       "title": "#ffffff",
       "text": "#fffefe",
       "border": "#333333",
-      "background": "url(#retro)",
+      "background": "#000000",
       "box": "url(#sunGradient)"
     }
   },

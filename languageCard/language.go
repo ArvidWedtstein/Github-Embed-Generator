@@ -221,8 +221,8 @@ func LanguageCard(title, user, langs_count string, cardstyle themes.Theme, isOrg
 		content = append(content, fmt.Sprintf(`
 		<g transform="translate(0,0)">
 			<circle cx="5" cy="6" r="5" fill="%v" />
-			<text width="130" x="15" y="10" class='text'>%v - %v%v</text>
-		</g>`, l.Value.Color, l.Key, card.CalculatePercentFloat(l.Value.Size, sum(ss)), "%"))
+			<text width="130" x="15" y="10" class='text'>%v - %v%%</text>
+		</g>`, l.Value.Color, l.Key, card.CalculatePercentFloat(l.Value.Size, sum(ss))))
 
 		// Create Slice for piechart
 		var slice = card.PieChartSlice{Name: l.Key, Percent: float64(card.CalculatePercentFloat(l.Value.Size, sum(ss))), Color: l.Value.Color}

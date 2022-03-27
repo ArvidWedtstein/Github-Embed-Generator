@@ -5,6 +5,7 @@ import (
 	"githubembedapi/card/style"
 	"githubembedapi/card/themes"
 	"math"
+	"math/rand"
 	"strconv"
 	"strings"
 )
@@ -221,11 +222,9 @@ type Bar struct {
 
 func BarChartVertical(bar Bar) string {
 	_, max := FindMinAndMax(bar.Values)
-
 	barGap := 10
 	columnWidth := 30
 	totalWidth := (columnWidth + barGap) * len(bar.Values)
-
 	barChart := []string{
 		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
 			totalWidth, max+120, totalWidth, max+120),
@@ -233,7 +232,6 @@ func BarChartVertical(bar Bar) string {
 	BarChartAdd := func(content string) {
 		barChart = append(barChart, content)
 	}
-
 	// Grid
 	BarChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
 		barGap*2, barGap, (max + 30), totalWidth))
@@ -252,7 +250,6 @@ func BarChartVertical(bar Bar) string {
 		BarChartAdd(fmt.Sprintf(`<path d="%v" stroke="#333333" opacity="0.3" stroke-width="1" />`, strings.Join(path, " ")))
 	}
 	BarChartAdd(`</g>`)
-
 	// Add columns
 	content := []string{}
 	for i, v := range bar.Values {
@@ -272,25 +269,19 @@ func BarChartVertical(bar Bar) string {
 				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/></g>`,
 					(20+barGap)*i, (max+30)-v, 20, v, "#ff0000"))
 			}
-
 		}
 	}
-
 	// Generate Row for columns
 	BarChartAdd(FlexBox(bar.Height, barGap*3, 0, barGap, content, true))
-
 	BarChartAdd(`</g></svg>`)
 	return strings.Join(barChart, "\n")
 }
 
 // Bar Chart Horizontal
 func BarChartHorizontal(bar Bar) string {
-
 	_, max := FindMinAndMax(bar.Values)
-
 	barGap := 10
 	columnHeight := 30
-
 	// Calculate total height of all columns including padding between columns
 	totalHeight := (columnHeight + barGap) * len(bar.Values)
 
@@ -302,9 +293,7 @@ func BarChartHorizontal(bar Bar) string {
 		barChart = append(barChart, content)
 	}
 
-	// ----------------------------
 	// Grid
-	// ----------------------------
 	BarChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
 		barGap, barGap, totalHeight+20, ((max/10)+3)*10))
 	if bar.Grid {
@@ -327,9 +316,7 @@ func BarChartHorizontal(bar Bar) string {
 	}
 	BarChartAdd(`</g>`)
 
-	// ----------------------------
 	// Add Columns
-	// ----------------------------
 	content := []string{}
 	for i, v := range bar.Values {
 		if len(bar.Colors) > i {
@@ -340,7 +327,6 @@ func BarChartHorizontal(bar Bar) string {
 	}
 	// Generate Row for columns
 	BarChartAdd(FlexBox(bar.Height, 5, barGap, barGap, content, false))
-
 	BarChartAdd(`</g></svg>`)
 	return strings.Join(barChart, "\n")
 }
@@ -365,7 +351,6 @@ func LineChart(line Line) string {
 	LineChartAdd := func(content string) {
 		lineChart = append(lineChart, content)
 	}
-
 	// Grid
 	LineChartAdd(fmt.Sprintf(`<g data-testid="grid"><path d="M %v %v V %v H %v" fill="none" stroke="#333333" stroke-width="3" stroke-linecap="round"/>`,
 		padding*2, padding, max+(padding*4), width+padding))
@@ -377,7 +362,6 @@ func LineChart(line Line) string {
 				LineChartAdd(fmt.Sprintf(`<text style="font-size: 12px" text-anchor="middle" class="text" fill="#333333" x="%v" y="%v">%v</text>`,
 					padding, max+(padding*4)-(padding*i), (i * 10)))
 			}
-
 			// Generate Lines
 			if line.GridHorizontal {
 				grid = append(grid, fmt.Sprintf(`M %v %v L %v %v`, width+padding, (padding*i)+10, padding*2, (padding*i)+10))
@@ -473,7 +457,91 @@ func GetProgressAnimation(progress, radius int) string {
 		}
 	}`
 }
-func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, height int, hasBox bool, customStyles ...string) []string {
+
+// ----------------------------------------
+// Retro / Synthwave Mountain Generation
+// ----------------------------------------
+func mountain(width, height int, fill string, grid bool) string {
+	mountain := []string{fmt.Sprintf("M 0 %v", height)}
+	mountaingrid := []string{}
+	steps := width / 10
+	var lastrand int = 0
+	var lastrandgrid int = 0
+	var maxgrid = 2
+	var mingrid = 0
+	for i := 0; i < steps; i++ {
+		max := lastrand + 41
+		min := 40
+
+		randomCoord := rand.Intn(max-min) + min
+		mountain = append(mountain, fmt.Sprintf("L %v %v", i*10, height-randomCoord))
+		lastrand = randomCoord
+
+		// Wireframe
+		if i%2 == 0 {
+			maxgrid = (i * 10) + 10
+			mingrid = lastrandgrid
+		}
+		randomCoordGridX := rand.Intn(maxgrid-mingrid) + mingrid
+		mountaingrid = append(mountaingrid, fmt.Sprintf("M %v %v L %v %v", i*10, height-randomCoord, randomCoordGridX, height))
+		lastrandgrid = randomCoordGridX
+	}
+	mountain = append(mountain, fmt.Sprintf(`L %v %v Z`, width, height))
+	mountaingrid = append(mountaingrid, fmt.Sprintf(`L %v %v Z`, width, height))
+	path := []string{}
+	if grid {
+		// Mountain
+		path = append(path, fmt.Sprintf("<path d='%v' stroke='%v' stroke-width='1' fill='%v'/>", strings.Join(mountain, " "), "url(#retro)", fill))
+
+		// Grid
+		path = append(path, fmt.Sprintf("<path d='%v' stroke='%v' stroke-width='1' />", strings.Join(mountaingrid, ""), "url(#retro)"))
+	} else {
+		// Mountain
+		path = append(path, fmt.Sprintf("<path d='%v' fill='%v'/>", strings.Join(mountain, " "), fill))
+	}
+	return strings.Join(path, " ")
+}
+func generateGrid(width, height int) string {
+	path := []string{}
+	coordsLineX := []float64{568.5}
+	startnum := 568.5
+	coordsMoveX := []float64{-13.5}
+	startMx := -13.5
+	for i := 0; startnum <= 763; i++ {
+		num1 := startnum + 7
+		num2 := num1 + 6.5
+		num3 := num2 + 7
+		num4 := num3 + 6.5
+		num5 := num4 + 6.5
+
+		coordsLineX = append(coordsLineX, num1, num2, num3, num4, num5)
+		startnum = num5
+
+		num1m := startMx + 61
+		num2m := num1m + 61
+		num3m := num2m + 61.5
+		num4m := num3m + 61
+		num5m := num4m + 61
+		num6m := num5m + 61.5
+
+		coordsMoveX = append(coordsMoveX, num1m, num2m, num3m, num4m, num5m, num6m)
+		startMx = num6m
+
+	}
+
+	for i, v := range coordsMoveX {
+		path = append(path, fmt.Sprintf(`M %v 212 L %v 1 `, v, coordsLineX[i]))
+	}
+
+	fmt.Println(len(coordsLineX))
+	fmt.Println(len(coordsMoveX))
+	return strings.Join(path, " ")
+}
+
+// ----------------------------------------
+// Card Generation
+// ----------------------------------------
+func GenerateCard(cardstyle themes.Theme, defs, body []string, width, height int, hasBox bool, customStyles ...string) []string {
 	var card Card
 	card.Style = cardstyle
 
@@ -484,7 +552,80 @@ func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, h
 	**/
 	if cardstyle.Name == "retro" {
 		defs = append(defs, style.SunGradient())
+
 		defs = append(defs, style.LinearGradient("retro", 180, []string{"#fc00ff", "#00dbde"}))
+		body = append(body, fmt.Sprintf(`<svg width="%v" height="%v" viewbox="0 0 %v %v">`, width, height, width, height))
+
+		// TODO - generate grid dynamically
+		test := generateGrid(width, height)
+		fmt.Println(test)
+		// body = append(body, fmt.Sprintf(`<path transform="scale(0.8) translate(0,%v)" fill="none" stroke="url(#retro)" stroke-width="1.0391" stroke-miterlimit="10" d='
+		// M1263 212 L763 1
+		// M1221.5 212 L756.5 1
+		// M1180.5 212 L749.5 1
+		// M1139.5 212 L743 1
+		// M1098 212 L736 1
+		// M1057 212 L729.5 1
+		// M1016 212 L723 1
+		// M974.5 212 L716 1
+		// M933.5 212 L709.5 1
+		// M892.5 212 L702.5 1
+		// M851 212 L696 1
+		// M810 212 L689.5 1
+		// M769 212 L682.5 1
+		// M727.5 212 L676 1
+		// M686.5 212 L669 1
+		// M645.5 212 L662.5 1
+		// M604 212 L656 1
+		// M563 212 L649 1
+		// M522 212 L642.5 1
+		// M480.5 212 L635.5 1
+		// M439.5 212 L629 1
+		// M398.5 212 L622.5 1
+		// M357 212 L615.5 1
+		// M316 212 L609 1
+		// M275 212 L602 1
+		// M233.5 212 L595.5 1
+		// M192.5 212 L589 1
+		// M151.5 212 L582 1
+		// M110 212 L575.5 1
+		// M69 212 L568.5 1
+		// '></path>`, height-30,
+		// 	float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25,
+		// 	float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25,
+		// 	float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25,
+		// 	float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25,
+		// 	float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25,
+		// 	float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25, float64(width)+float64(width/5)+25),
+		// )
+		body = append(body, fmt.Sprintf(`<path transform="scale(0.8) translate(0,%v)" fill="none" stroke="url(#retro)" stroke-width="1.0391" stroke-miterlimit="10" d='%v'></path>`, height-30, test))
+		/*
+			M1 5.5 L%v 5.5 M1 6.5 L%v 6.5
+			M1 8 L%v 8 M1 9 L%v 9
+			M1 10.5 L%v 10.5 M1 12 L%v 12
+			M1 14 L%v 14 M1 15.5 L%v 15.5
+			M1 17.5 L%v 17.5 M1 19.5 L%v 19.5
+			M1 21.5 L%v 21.5 M1 23.5 L%v 23.5
+			M1 26 L%v 26 M1 29 L%v 29
+			M1 32 L%v 32 M1 35 L%v 35
+			M1 38.5 L%v 38.5 M1 42.5 L%v 42.5
+			M1 47 L%v 47 M1 52 L%v 52
+			M1 57.5 L%v 57.5 M1 63.5 L%v 63.5
+			M1 70.5 L%v 70.5 M1 79 L%v 79
+			M1 88.5 L%v.5 88.5 M1 99.5 L%v 99.5
+			M1 113 L%v 113 M1 129.5 L%v 129.5
+			M1 150.5 L%v 150.5 M1 177 L%v 177
+
+
+			M27.9989 212.40505 L1304.21275 212.40505
+			L770.01085 4.59495 L562.21075 4.59495
+			L27.9989 212.40505
+		*/
+		if height > 400 {
+			body = append(body, fmt.Sprintf(`<circle cx="%v" cy="%v" filter="url(#shadow)" fill="url(#sunGradient)" r="30"/>`, width/2, (height/2)+(height/8)))
+			body = append(body, fmt.Sprintf("<g transform='translate(0,190) scale(0.5)'>%v%v</g>", mountain(width*2, height, "#111111", false), mountain(width*2, height, "#222222", true)))
+		}
+		body = append(body, `</svg>`)
 	}
 	if cardstyle.Name == "rgb" {
 		defs = append(defs, style.LinearGradient("rgb", 180, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}))
@@ -511,7 +652,7 @@ func GenerateCard(cardstyle themes.Theme, defs []string, body []string, width, h
 			stroke-width: `+strconv.Itoa(strokewidth)+`px;
 		}
 		`)
-		card.Body = append(card.Body, card.GetStyles(customStyles...), fmt.Sprintf(`<rect x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width-strokewidth, height-strokewidth))
+		card.Body = append(card.Body, card.GetStyles(customStyles...), fmt.Sprintf(`<rect id="box" x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width-strokewidth, height-strokewidth))
 	}
 
 	card.Body = append(card.Body, strings.Join(body, "\n"), `</svg>`)
@@ -567,4 +708,13 @@ func FindMinAndMax(a []int) (min int, max int) {
 		}
 	}
 	return min, max
+}
+
+func ArrayContains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

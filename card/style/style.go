@@ -88,10 +88,10 @@ func LinearGradient(id string, degree int, colors []string) string {
 	// Calculate rotation
 	anglePI := float64(degree) * (math.Pi / 180)
 	angleCoords := map[string]string{
-		"x1": fmt.Sprintf("%v%v", math.Round(50+math.Sin(anglePI)*50), "%"),
-		"y1": fmt.Sprintf("%v%v", math.Round(50+math.Cos(anglePI)*50), "%"),
-		"x2": fmt.Sprintf("%v%v", math.Round(50+math.Sin(anglePI+math.Pi)*50), "%"),
-		"y2": fmt.Sprintf("%v%v", math.Round(50+math.Cos(anglePI+math.Pi)*50), "%"),
+		"x1": fmt.Sprintf("%v%%", math.Round(50+math.Sin(anglePI)*50)),
+		"y1": fmt.Sprintf("%v%%", math.Round(50+math.Cos(anglePI)*50)),
+		"x2": fmt.Sprintf("%v%%", math.Round(50+math.Sin(anglePI+math.Pi)*50)),
+		"y2": fmt.Sprintf("%v%%", math.Round(50+math.Cos(anglePI+math.Pi)*50)),
 	}
 	gradient := []string{
 		fmt.Sprintf(`<linearGradient x1="%v" y1="%v" x2="%v" y2="%v" id="%v" gradientUnits="userSpaceOnUse">`,
@@ -154,20 +154,20 @@ func SunGradient() string {
 	<stop offset="100%" stop-color="#ff2975" />
   </linearGradient>
   <filter id="shadow">
-	<feDropShadow dx="0.2" dy="6" stdDeviation="5" flood-color="var(--pink)" flood-opacity="0.3" />
-	<feDropShadow dx="0.2" dy="-6" stdDeviation="5" flood-color="var(--yellow)" flood-opacity="0.3" />
+	<feDropShadow dx="0.2" dy="4" stdDeviation="5" flood-color="#ff2975" flood-opacity="0.3" />
+	<feDropShadow dx="0.2" dy="-4" stdDeviation="5" flood-color="#ffd319" flood-opacity="0.3" />
   </filter>`
 }
 
 func NeonFilter(color string) string {
-	filter := fmt.Sprintf(`<filter id="glow" height="300%v" width="300%v" x="-75%v" y="-75%v">
+	filter := fmt.Sprintf(`<filter id="glow" height="300%%" width="300%%" x="-75%%" y="-75%%">
 	<feMorphology operator="dilate" radius="2" in="SourceAlpha" result="thicken" />
 	<feGaussianBlur in="thicken" stdDeviation="10" result="blurred" />
 	<feFlood flood-color="%v" result="glowColor" />
 	<feComposite in="glowColor" in2="blurred" operator="in" result="softGlow_colored" />
 	<feMerge><feMergeNode in="softGlow_colored"/>
 	<feMergeNode in="SourceGraphic"/></feMerge>
-	</filter>`, "%", "%", "%", "%", color)
+	</filter>`, color)
 	return filter
 }
 func Table() string {
