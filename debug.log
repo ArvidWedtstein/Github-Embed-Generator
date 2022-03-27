@@ -2,431 +2,67 @@
 
 
 {
-  "data": {
-    "user": {
-      "contributionsCollection": {
-        "totalCommitContributions": 2,
-        "totalIssueContributions": 0,
-        "totalPullRequestContributions": 0,
-        "totalPullRequestReviewContributions": 0,
-        "contributionCalendar": {
-          "totalContributions": 489
-        }
-      },
-      "repositories": {
-        "nodes": [
-          {
-            "name": "tempus",
-            "stargazerCount": 0,
-            "diskUsage": 9,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 2
-            },
-            "issues": {
-              "totalCount": 0
-            },
-            "defaultBranchRef": {
-              "name": "master",
-              "target": {
-                "history": {
-                  "totalCount": 8
-                }
-              }
-            }
-          },
-          {
-            "name": ".v",
-            "stargazerCount": 1,
-            "diskUsage": 43614,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 1
-            },
-            "issues": {
-              "totalCount": 0
-            },
-            "defaultBranchRef": {
-              "name": "master",
-              "target": {
-                "history": {
-                  "totalCount": 59
-                }
-              }
-            }
-          },
-          {
-            "name": "mk",
-            "stargazerCount": 0,
-            "diskUsage": 790,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 1
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 1
-            },
-            "issues": {
-              "totalCount": 0
-            },
-            "defaultBranchRef": {
-              "name": "master",
-              "target": {
-                "history": {
-                  "totalCount": 42
-                }
-              }
-            }
-          },
-          {
-            "name": "victorberland.com",
-            "stargazerCount": 0,
-            "diskUsage": 1737,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 1
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 1
-            },
-            "issues": {
-              "totalCount": 0
-            },
-            "defaultBranchRef": {
-              "name": "master",
-              "target": {
-                "history": {
-                  "totalCount": 21
-                }
-              }
-            }
-          },
-          {
-            "name": "prosjekt01",
-            "stargazerCount": 0,
-            "diskUsage": 6921,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 1
-            },
-            "issues": {
-              "totalCount": 0
-            },
-            "defaultBranchRef": {
-              "name": "master",
-              "target": {
-                "history": {
-                  "totalCount": 3
-                }
-              }
-            }
-          },
-          {
-            "name": "fluis",
-            "stargazerCount": 0,
-            "diskUsage": 592,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 3
-            },
-            "issues": {
-              "totalCount": 1
-            },
-            "defaultBranchRef": {
-              "name": "main",
-              "target": {
-                "history": {
-                  "totalCount": 21
-                }
-              }
-            }
-          },
-          {
-            "name": "fluis-api",
-            "stargazerCount": 0,
-            "diskUsage": 3540,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 3
-            },
-            "issues": {
-              "totalCount": 0
-            },
-            "defaultBranchRef": {
-              "name": "main",
-              "target": {
-                "history": {
-                  "totalCount": 26
-                }
-              }
-            }
-          },
-          {
-            "name": "s3-sync",
-            "stargazerCount": 0,
-            "diskUsage": 2,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 1
-            },
-            "issues": {
-              "totalCount": 0
-            },
-            "defaultBranchRef": {
-              "name": "master",
-              "target": {
-                "history": {
-                  "totalCount": 5
-                }
-              }
-            }
-          },
-          {
-            "name": "ScreenMessageSolution",
-            "stargazerCount": 0,
-            "diskUsage": 65446,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 2
-            },
-            "watchers": {
-              "totalCount": 2
-            },
-            "issues": {
-              "totalCount": 4
-            },
-            "defaultBranchRef": {
-              "name": "main",
-              "target": {
-                "history": {
-                  "totalCount": 110
-                }
-              }
-            }
-          },
-          {
-            "name": "Nuxt-Website",
-            "stargazerCount": 1,
-            "diskUsage": 181679,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 2
-            },
-            "releases": {
-              "totalCount": 1
-            },
-            "watchers": {
-              "totalCount": 2
-            },
-            "issues": {
-              "totalCount": 7
-            },
-            "defaultBranchRef": {
-              "name": "main",
-              "target": {
-                "history": {
-                  "totalCount": 215
-                }
-              }
-            }
-          },
-          {
-            "name": "Website-API",
-            "stargazerCount": 0,
-            "diskUsage": 6320,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 2
-            },
-            "issues": {
-              "totalCount": 1
-            },
-            "defaultBranchRef": {
-              "name": "main",
-              "target": {
-                "history": {
-                  "totalCount": 149
-                }
-              }
-            }
-          },
-          {
-            "name": "andical-nettside",
-            "stargazerCount": 0,
-            "diskUsage": 1745,
-            "forkCount": 0,
-            "milestones": {
-              "totalCount": 0
-            },
-            "packages": {
-              "totalCount": 0
-            },
-            "pullRequests": {
-              "totalCount": 0
-            },
-            "releases": {
-              "totalCount": 0
-            },
-            "watchers": {
-              "totalCount": 2
-            },
-            "issues": {
-              "totalCount": 0
-            },
-            "defaultBranchRef": {
-              "name": "master",
-              "target": {
-                "history": {
-                  "totalCount": 27
-                }
-              }
-            }
-          }
-        ]
-      },
-      "repositoriesContributedTo": {
-        "nodes": [
-          {
-            "nameWithOwner": "chrislusf/seaweedfs",
-            "owner": {
-              "login": "chrislusf"
-            },
-            "isInOrganization": false
-          },
-          {
-            "nameWithOwner": "ArvidWedtstein/ScreenMessageSolution",
-            "owner": {
-              "login": "ArvidWedtstein"
-            },
-            "isInOrganization": false
-          },
-          {
-            "nameWithOwner": "appex/appex-tournaments",
-            "owner": {
-              "login": "appex"
-            },
-            "isInOrganization": true
-          }
-        ],
-        "totalCount": 3
+  user(login: "victorberland") {
+    contributionsCollection(
+      from: "2022-01-01T00:00:00Z"
+      to: "2022-12-31T23:59:59Z"
+    ) {
+      totalCommitContributions
+      totalIssueContributions
+      totalPullRequestContributions
+      totalPullRequestReviewContributions
+      contributionCalendar {
+        totalContributions
       }
+    }
+    repositories(last: 100, isFork: false, affiliations: OWNER, privacy: PUBLIC) {
+      nodes {
+        name
+        stargazerCount
+        diskUsage
+        forkCount
+        milestones {
+          totalCount
+        }
+        packages {
+          totalCount
+        }
+        pullRequests {
+          totalCount
+        }
+        releases {
+          totalCount
+        }
+        watchers {
+          totalCount
+        }
+        issues {
+          totalCount
+        }
+        defaultBranchRef {
+          name
+          target {
+            ... on Commit {
+              history {
+                totalCount
+              }
+            }
+          }
+        }
+      }
+    }
+    repositoriesContributedTo(
+      first: 100
+      contributionTypes: [COMMIT, ISSUE, PULL_REQUEST, REPOSITORY]
+    ) {
+      nodes {
+        nameWithOwner
+        owner {
+          login
+        }
+        isInOrganization
+      }
+      totalCount
     }
   }
 }
