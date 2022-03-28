@@ -56,12 +56,77 @@ Example:
 Example:
 `https://arvidgithubembed.herokuapp.com/commitactivity?user=arvidwedtstein&repo=github-embed-generator&titlecolor=000000&textColor=000000&backgroundcolor=ffffff&hide_week=false`
 
+
+## Hide Individual Stats
+
+`&hide=stat1,stat2...`
+
+<table>
+   <thead>
+      <tr>
+         <th>Options</th>
+         <th>Query</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td>Contributions</td>
+         <td>&hide=contributions</td>
+      </tr>
+      <tr>
+         <td>Milestones</td>
+         <td>&hide=milestones</td>
+      </tr>
+      <tr>
+         <td>Packages</td>
+         <td>&hide=packages</td>
+      </tr>
+      <tr>
+         <td>Forks</td>
+         <td>&hide=forks</td>
+      </tr>
+      <tr>
+         <td>Releases</td>
+         <td>&hide=releases</td>
+      </tr>
+      <tr>
+         <td>Watchers</td>
+         <td>&hide=watchers</td>
+      </tr>
+      <tr>
+         <td>Stars Earned</td>
+         <td>&hide=stars</td>
+      </tr>
+      <tr>
+         <td>Disk Usage</td>
+         <td>&hide=disk</td>
+      </tr>
+      <tr>
+         <td>Pull Requests</td>
+         <td>&hide=pull</td>
+      </tr>
+      <tr>
+         <td>Issues</td>
+         <td>&hide=issues</td>
+      </tr>
+      <tr>
+         <td>Repositories Contributed To</td>
+         <td>&hide=repocontributions</td>
+      </tr>
+      <tr>
+         <td>Organizations Contributed To</td>
+         <td>&hide=orgcontributions</td>
+      </tr>
+   </tbody>
+</table>
+
 # Contribution
 
 Contributions are welcome!
 Feel free to open a pull request or an issue
 
 Make sure your request is meaningful and you have tested the app locally before submitting a pull request.
+
 
 
 

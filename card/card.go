@@ -504,7 +504,7 @@ func mountain(width, height int, fill string, grid bool) string {
 func generateGrid(width, height float64) string {
 	path := []string{}
 	coordsLineX := []float64{-7.5}
-	//568.5
+
 	startnum := -7.5
 	coordsMoveX := []float64{-13.5}
 	startMx := -13.5
@@ -528,24 +528,38 @@ func generateGrid(width, height float64) string {
 
 		coordsMoveX = append(coordsMoveX, num1m, num2m, num3m, num4m, num5m, num6m)
 		startMx = num6m
-
 	}
-
 	for i, v := range coordsLineX {
 		path = append(path, fmt.Sprintf(`M %v 212 L %v 1 `, coordsMoveX[i], v))
 	}
 	startYLine := 5.5
 	var step float64 = 2.5
-	for i := 0; i < 100; i++ {
-
+	for i := 0; i < 20; i++ {
 		path = append(path, fmt.Sprintf("M1 %v L%v %v", startYLine, width, startYLine))
-
 		if i%3 == 0 {
 			step += 2
 		}
 		startYLine += step
 	}
+	return strings.Join(path, " ")
+}
+func wave(width, height int) string {
 
+	path := []string{fmt.Sprintf(`M 1.5 %v`, height)}
+	posX := 0
+
+	for i := 0; posX < width; i++ {
+		// c dx1, dy1 dx2, dy2 dx, dy
+		// Uppercase C uses absolute coordinates
+		// Lowercase c uses relative coordinates
+		// dy := height - 50
+
+		randomDY := rand.Intn(50) + (height - 50)
+		path = append(path, fmt.Sprintf(`C %v,%v %v,%v %v,%v`, posX, randomDY, posX, randomDY, posX, height-100))
+
+		posX += 50
+	}
+	path = append(path, fmt.Sprintf(`L %v %v Z`, width, height))
 	return strings.Join(path, " ")
 }
 
@@ -561,6 +575,7 @@ func GenerateCard(cardstyle themes.Theme, defs, body []string, width, height int
 		-------------
 		Make some kind of system for handling gradients
 	**/
+	theme := []string{}
 
 	if cardstyle.Name == "rgb" {
 		defs = append(defs, style.LinearGradient("rgb", 180, []string{"#1f005c", "#5b0060", "#870160", "#ac255e", "#ca485c", "#e16b5c", "#f39060", "#ffb56b"}))
@@ -572,24 +587,25 @@ func GenerateCard(cardstyle themes.Theme, defs, body []string, width, height int
 	if cardstyle.Name == "red" {
 		defs = append(defs, style.LinearGradient("redgrad", -90, []string{"#c31432", "#240b36"}))
 		defs = append(defs, style.LinearGradient("fire", 0, []string{"#f12711", "#f5af19"}))
+
+		wave := wave(width, height)
+		theme = append(theme, fmt.Sprintf(`<path transform="translate(0,0)" fill="url(#fire)" d='%v'></path>`, wave))
 	}
 
-	retro := []string{}
 	if cardstyle.Name == "retro" {
 		defs = append(defs, style.SunGradient())
 
 		defs = append(defs, style.LinearGradient("retro", 180, []string{"#fc00ff", "#00dbde"}))
-		retro = append(retro, fmt.Sprintf(`<svg width="%v" height="%v" viewbox="0 0 %v %v">`, width, height, width, height))
+		theme = append(theme, fmt.Sprintf(`<svg width="%v" height="%v" viewbox="0 0 %v %v">`, width, height, width, height))
 
-		// TODO - generate grid dynamically
-		test := generateGrid(float64(width)+float64(width/5)+25, float64(height))
-		retro = append(retro, fmt.Sprintf(`<path transform="scale(0.8) translate(0,%v)" fill="none" stroke="url(#retro)" stroke-width="1.0391" stroke-miterlimit="10" d='%v'></path>`, height-30, test))
+		grid := generateGrid(float64(width)+float64(width/5)+25, float64(height))
+		theme = append(theme, fmt.Sprintf(`<path transform="scale(0.8) translate(0,%v)" fill="none" stroke="url(#retro)" stroke-width="1.0391" stroke-miterlimit="10" d='%v'></path>`, height-30, grid))
 
 		if height > 400 {
-			retro = append(retro, fmt.Sprintf(`<circle cx="%v" cy="%v" filter="url(#shadow)" fill="url(#sunGradient)" r="60"><animate attributeName="cy" dur="5s" values="%v;%v" repeatCount="0" /><animate attributeName="r" dur="5s" values="10;60" repeatCount="0" /></circle>`, width/2, (height/2)+(height/8), ((height/2)+(height/8))+100, (height/2)+(height/8)))
-			retro = append(retro, fmt.Sprintf("<g transform='translate(0,190) scale(0.5)'>%v%v</g>", mountain(width*2, height, "#111111", false), mountain(width*2, height, "#222222", true)))
+			theme = append(theme, fmt.Sprintf(`<circle cx="%v" cy="%v" filter="url(#shadow)" fill="url(#sunGradient)" r="60"><animate attributeName="cy" dur="5s" values="%v;%v" repeatCount="0" /><animate attributeName="r" dur="5s" values="10;60" repeatCount="0" /></circle>`, width/2, (height/2)+(height/8), ((height/2)+(height/8))+100, (height/2)+(height/8)))
+			theme = append(theme, fmt.Sprintf("<g transform='translate(0,190) scale(0.5)'>%v%v</g>", mountain(width*2, height, "#111111", false), mountain(width*2, height, "#222222", true)))
 		}
-		retro = append(retro, `</svg>`)
+		theme = append(theme, `</svg>`)
 	}
 
 	card.Body = []string{
@@ -608,7 +624,7 @@ func GenerateCard(cardstyle themes.Theme, defs, body []string, width, height int
 		card.Body = append(card.Body, card.GetStyles(customStyles...), fmt.Sprintf(`<rect id="box" x="%v" y="%v" class="box" width="%v" height="%v" rx="15"  />`, strokewidth/2, strokewidth/2, width-strokewidth, height-strokewidth))
 	}
 
-	card.Body = append(card.Body, strings.Join(retro, "\n"), strings.Join(body, "\n"), `</svg>`)
+	card.Body = append(card.Body, strings.Join(theme, "\n"), strings.Join(body, "\n"), `</svg>`)
 	return card.Body
 }
 
@@ -670,4 +686,8 @@ func ArrayContains(s []string, str string) bool {
 		}
 	}
 	return false
+}
+func RemoveFromSlice(s []string, i int) []string {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }

@@ -21,7 +21,7 @@ import (
 func main() {
 	router := gin.Default()
 	router.StaticFS("/static", http.Dir("./static"))
-	router.StaticFile("/.env", "/.env")
+	// router.StaticFile("/.env", "/.env")
 	// router.GET("/ranklist", rankList)
 	router.GET("/skills", getSkills)
 	router.GET("/mostactivity", getMostactivity)
@@ -44,10 +44,10 @@ func statscard(c *gin.Context) {
 
 	user := c.Request.FormValue("user")
 	title := c.Request.FormValue("title")
-
+	hide := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("hide")), ",")
 	var color = style.CheckTheme(c)
 
-	c.String(http.StatusOK, stats.Stats(title, user, color))
+	c.String(http.StatusOK, stats.Stats(title, user, hide, color))
 }
 
 func getMostactivity(c *gin.Context) {

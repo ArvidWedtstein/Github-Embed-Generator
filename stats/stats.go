@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 	"time"
 )
@@ -22,6 +23,9 @@ type Data struct {
 				TotalIssueContributions             int `json:"totalIssueContributions"`
 				TotalPullRequestContributions       int `json:"totalPullRequestContributions"`
 				TotalPullRequestReviewContributions int `json:"totalPullRequestReviewContributions"`
+				ContributionCalendar                struct {
+					TotalContributions int `json:"totalContributions"`
+				} `json:"contributionCalendar"`
 			} `json:"contributionsCollection"`
 			Repositories struct {
 				Nodes []struct {
@@ -63,7 +67,7 @@ type Data struct {
 	} `json:"data"`
 }
 
-func Stats(title string, user string, cardstyle themes.Theme) string {
+func Stats(title string, user string, hide []string, cardstyle themes.Theme) string {
 
 	year := time.Now().Year()
 	jsonData := map[string]string{
@@ -75,6 +79,9 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 					totalIssueContributions
 					totalPullRequestContributions
 					totalPullRequestReviewContributions
+					contributionCalendar {
+						totalContributions
+					}
                 }
 				repositories(last: 100, isFork: false, affiliations: OWNER, privacy: PUBLIC) {
 					nodes {
@@ -146,11 +153,13 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 	}
 
 	contributionsCollection := data.Data.User.ContributionsCollection
-	totalContributions := contributionsCollection.TotalCommitContributions
+	// totalContributions := contributionsCollection.TotalCommitContributions
 
-	totalContributions += contributionsCollection.TotalIssueContributions
-	totalContributions += contributionsCollection.TotalPullRequestContributions
-	totalContributions += contributionsCollection.TotalPullRequestReviewContributions
+	// totalContributions += contributionsCollection.TotalIssueContributions
+	// totalContributions += contributionsCollection.TotalPullRequestContributions
+	// totalContributions += contributionsCollection.TotalPullRequestReviewContributions
+
+	totalContributions := contributionsCollection.ContributionCalendar.TotalContributions
 	repositoriesContributedTo := data.Data.User.RepositoriesContributedTo.TotalCount
 
 	orgsContributedTo := []string{}
@@ -159,8 +168,6 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 			orgsContributedTo = append(orgsContributedTo, v.Owner.Login)
 		}
 	}
-	fmt.Printf("Repos Contributed To: %v\n", repositoriesContributedTo)
-	fmt.Printf("Orgs Contributed to: %v\n", len(orgsContributedTo))
 
 	totalMilestones := 0
 	totalPackages := 0
@@ -213,17 +220,47 @@ func Stats(title string, user string, cardstyle themes.Theme) string {
 		fmt.Sprintf(`<text x="" y="" class="title">Total Watchers: %v</text>`, totalWatchers),
 		fmt.Sprintf(`<text x="" y="" class="title">Total Stars Earned: %v</text>`, totalStargazers),
 		fmt.Sprintf(`<text x="" y="" class="title">Total Disk Usage: %v</text>`, totalDiskUsage),
+		fmt.Sprintf(`<text x="" y="" class="title">Total Pull Requests: %v</text>`, totalPullRequests),
+		fmt.Sprintf(`<text x="" y="" class="title">Total Issues: %v</text>`, totalIssues),
+		fmt.Sprintf(`<text x="" y="" class="title">Total Repositories Contributed To: %v</text>`, repositoriesContributedTo),
+		fmt.Sprintf(`<text x="" y="" class="title">Total Organizations Contributed To: %v</text>`, len(orgsContributedTo)),
+	}
+
+	hideoptions := []string{
+		"contributions",
+		"milestones",
+		"packages",
+		"forks",
+		"releases",
+		"watchers",
+		"stars",
+		"disk",
+		"pull",
+		"issues",
+		"repocontributions",
+		"orgcontributions",
+	}
+	if len(hide) > 0 {
+		for _, v := range hide {
+			if card.ArrayContains(hideoptions, v) {
+				// Sort alphabetically
+				sort.Slice(content, func(i, j int) bool {
+					return content[i] < content[j]
+				})
+				fmt.Println("--------------------")
+				for _, v2 := range content {
+					fmt.Println(v2)
+				}
+				idx := sort.Search(len(content), func(i int) bool {
+					return strings.Contains(content[i], card.ToTitleCase(v))
+				})
+				fmt.Println(idx)
+				content = card.RemoveFromSlice(content, idx)
+			}
+		}
 	}
 
 	bodyAdd(card.FlexBox(width, 20, titleboxheight, 30, content, false))
-	// content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Contributions: %v</text>`, titleboxheight+30, totalContributions))
-	// content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Milestones: %v</text>`, titleboxheight+60, totalMilestones))
-	// content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Packages: %v</text>`, titleboxheight+90, totalPackages))
-	// content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Forks: %v</text>`, titleboxheight+120, totalForks))
-	// content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Releases: %v</text>`, titleboxheight+150, totalReleases))
-	// content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Watchers: %v</text>`, titleboxheight+180, totalWatchers))
-	// content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Stars Earned: %v</text>`, titleboxheight+210, totalStargazers))
-	// content = append(content, fmt.Sprintf(`<text x="20" y="%v" class="title">Total Disk Usage: %v</text>`, titleboxheight+240, totalDiskUsage))
 
 	// Line on top
 	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="%v"/>`, titleboxheight, width, strokewidth, cardstyle.Colors.Border)}, body...)
