@@ -191,7 +191,7 @@ func Stats(title string, user string, hide []string, cardstyle themes.Theme) str
 		totalIssues += v.Issues.TotalCount
 	}
 
-	height := 700
+	height := 350
 	width := 600
 	titleboxheight := 50
 	// padding := 10
@@ -212,18 +212,18 @@ func Stats(title string, user string, hide []string, cardstyle themes.Theme) str
 		body = append(body, content...)
 	}
 	content := []string{
-		fmt.Sprintf(`<text x="" y="" class="title">Total Contributions: %v</text>`, totalContributions),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Milestones: %v</text>`, totalMilestones),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Packages: %v</text>`, totalPackages),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Forks: %v</text>`, totalForks),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Releases: %v</text>`, totalReleases),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Watchers: %v</text>`, totalWatchers),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Stars Earned: %v</text>`, totalStargazers),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Disk Usage: %v</text>`, totalDiskUsage),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Pull Requests: %v</text>`, totalPullRequests),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Issues: %v</text>`, totalIssues),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Repositories Contributed To: %v</text>`, repositoriesContributedTo),
-		fmt.Sprintf(`<text x="" y="" class="title">Total Organizations Contributed To: %v</text>`, len(orgsContributedTo)),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Contributions: %v</text>`, totalContributions),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Milestones: %v</text>`, totalMilestones),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Packages: %v</text>`, totalPackages),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Forks: %v</text>`, totalForks),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Releases: %v</text>`, totalReleases),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Watchers: %v</text>`, totalWatchers),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Stars Earned: %v</text>`, totalStargazers),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Disk Usage: %v</text>`, totalDiskUsage),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Pull Requests: %v</text>`, totalPullRequests),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Issues: %v</text>`, totalIssues),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Repositories Contributed To: %v</text>`, repositoriesContributedTo),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Organizations Contributed To: %v</text>`, len(orgsContributedTo)),
 	}
 
 	hideoptions := []string{
@@ -254,13 +254,12 @@ func Stats(title string, user string, hide []string, cardstyle themes.Theme) str
 				idx := sort.Search(len(content), func(i int) bool {
 					return strings.Contains(content[i], card.ToTitleCase(v))
 				})
-				fmt.Println(idx)
 				content = card.RemoveFromSlice(content, idx)
 			}
 		}
 	}
 
-	bodyAdd(card.FlexBox(width, 20, titleboxheight, 30, content, false))
+	bodyAdd(card.FlexBox(width, 20, titleboxheight, 20, content, false))
 
 	// Line on top
 	body = append([]string{fmt.Sprintf(`<rect x="0" y="%v" width="%v" height="%v" fill="%v"/>`, titleboxheight, width, strokewidth, cardstyle.Colors.Border)}, body...)

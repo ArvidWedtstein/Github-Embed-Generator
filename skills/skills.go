@@ -24,9 +24,11 @@ func Skills(title string, languages []string, cardstyle themes.Theme) string {
 
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
-		`.languagebox { 
-			fill: ` + cardstyle.Colors.Box + `;
-		}`,
+		fmt.Sprintf(`.languagebox rect { 
+			fill: none;
+			stroke: %v;
+			stroke-width: %v;
+		}`, cardstyle.Colors.Border, strokewidth),
 	}
 	defs := []string{
 		style.RadialGradient("paint0_angular_0_1", []string{"#7400B8", "#6930C3", "#5E60CE", "#5390D9", "#4EA8DE", "#48BFE3", "#56CFE1", "#64DFDF", "#72EFDD"}),

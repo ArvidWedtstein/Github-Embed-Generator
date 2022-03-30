@@ -601,9 +601,9 @@ func GenerateCard(cardstyle themes.Theme, defs, body []string, width, height int
 		grid := generateGrid(float64(width)+float64(width/5)+25, float64(height))
 		theme = append(theme, fmt.Sprintf(`<path transform="scale(0.8) translate(0,%v)" fill="none" stroke="url(#retro)" stroke-width="1.0391" stroke-miterlimit="10" d='%v'></path>`, height-30, grid))
 
-		if height > 400 {
-			theme = append(theme, fmt.Sprintf(`<circle cx="%v" cy="%v" filter="url(#shadow)" fill="url(#sunGradient)" r="60"><animate attributeName="cy" dur="5s" values="%v;%v" repeatCount="0" /><animate attributeName="r" dur="5s" values="10;60" repeatCount="0" /></circle>`, width/2, (height/2)+(height/8), ((height/2)+(height/8))+100, (height/2)+(height/8)))
-			theme = append(theme, fmt.Sprintf("<g transform='translate(0,190) scale(0.5)'>%v%v</g>", mountain(width*2, height, "#111111", false), mountain(width*2, height, "#222222", true)))
+		if height >= 300 {
+			theme = append(theme, fmt.Sprintf(`<circle cx="%v" cy="%v" filter="url(#shadow)" fill="url(#sunGradient)" r="30"><animate attributeName="cy" dur="5s" values="%v;%v" repeatCount="0" /><animate attributeName="r" dur="5s" values="10;30" repeatCount="0" /></circle>`, (width/2)+(width/4), (height/2), ((height/2)+(height/8))+10, (height/2)))
+			theme = append(theme, fmt.Sprintf("<g transform='translate(0,100) scale(0.5)'>%v%v</g>", mountain(width*2, height, "#111111", false), mountain(width*2, height, "#222222", true)))
 		}
 		theme = append(theme, `</svg>`)
 	}
