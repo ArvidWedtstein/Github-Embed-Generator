@@ -37,8 +37,8 @@ func main() {
 		fmt.Printf("Error loading .env file")
 	}
 
-	router.Run("localhost:8080")
-	// router.Run()
+	// router.Run("localhost:8080")
+	router.Run()
 }
 
 func statscard(c *gin.Context) {
