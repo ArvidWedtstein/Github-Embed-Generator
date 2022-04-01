@@ -691,3 +691,11 @@ func RemoveFromSlice(s []string, i int) []string {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
+func IndexOf(element string, data []string) int {
+	for k, v := range data {
+		if strings.Contains(v, ToTitleCase(element)) {
+			return k
+		}
+	}
+	return -1 //not found.
+}

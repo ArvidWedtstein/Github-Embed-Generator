@@ -6,48 +6,78 @@ https://arvidgithubembed.herokuapp.com/static/
 ## Better description & docs will come soon. (When i have time left)
 
 
+# Features:
+
+- [GitHub Stats Card](#github-stats-card)
+- [Top Languages Card](#top-languages-card)
+- [Project Card](#project-card)
+- [Skills Card](#skills-card)
+- [Organization Activity Card](#org-activity-card)
+- [Repository Commit Activity Card](#repo-commit-activity-card)
+- [Streak Card](#streak-card)
+- [Icon](#icon-card)
+- [Themes](#themes)
+- [Customization](#customization)
+  - [Common Options](#common-options)
+  - [Stats Card Exclusive Options](#stats-card-exclusive-options)
+  - [Repo Card Exclusive Options](#repo-card-exclusive-options)
+  - [Language Card Exclusive Options](#language-card-exclusive-options)
+  - [Wakatime Card Exclusive Option](#wakatime-card-exclusive-options)
+- [Deploy Yourself](#deploy-on-your-own-vercel-instance)
+
+
 ![](https://img.shields.io/github/go-mod/go-version/arvidwedtstein/github-embed-generator?style=for-the-badge)
 
-## Routes
-Languages are comma seperated
-| Routes | Query |
-|---|---|
-| /skills | ?languages=lang1,lang2,lang3 |
-| /rankList | ?users=user1,user2 |
-| /mostactivity | ?org=devco-morkjebla |
-| /commitactivity | ?user=arvidwedtstein&repo=github-embed-generator |
-| /project | ?user=arvidwedtstein&repo=github-embed-generator |
 
-Example: `https://arvidgithubembed.herokuapp.com/skills?languages=php,mysql,javascript,typescript`
+## GitHub Stats Card
+
+Change the `?user=` to your own Github username.
+
+```md
+[![Arvid's Github Stats](https://arvidgithubembed.herokuapp.com/stats?user=arvidwedtstein)]
+```
+
+### Hide your stats
+
+This API allows you to hide individual stats with the query parameter `?hide=`. Multiple stats to hide have to be comma-seperated. 
+
+> Options: `contributions,milestones,packages,forks,releases,watchers,stars,disk,pull,issues,repocontributions,orgcontributions`
+   
+```md
+[![Arvid's Github Stats](https://arvidgithubembed.herokuapp.com/stats?user=arvidwedtstein&hide=contributions)]
+```
+
+### Themes
+
+Yes. Da themes have arrived. You can now customize your card without having these long urls
+
+To use a theme add the parameter `&theme=THEME_NAME` to the url
+
+```md
+[![Arvid's Github Stats](https://arvidgithubembed.herokuapp.com/stats?user=arvidwedtstein&theme=retro)]
+```
+
+#### All themes :-
+
+light, dark, rgb, lartrax, retro, vue-dark, ig9te, github, red, toringe
+
 ### Customization
 
-- `titlecolor` - Card's title color _(hex color)_
-- `textcolor` - Body text color _(hex color)_
-- `bordercolor` - Card's border color _(hex color)_.
-- `backgroundcolor` - Card's background color _(hex color)_
-- `title` - Card's custom title _(string)_
-- `boxcolor` - Color of the boxes with the logos inside _(hex color)_
-
-
-
- users are comma seperated
-> /rankList/:users
+In addition to themes you can also customize your card with URL parameters.
 
 #### Common Options:
 All hex colors without '#' please
 - `titlecolor` - Card's title color _(hex color)_
-- `textcolor` - Body text color _(hex color)_
+- `textcolor` - Card's text color _(hex color)_
 - `bordercolor` - Card's border color _(hex color)_.
 - `backgroundcolor` - Card's background color _(hex color)_ 
-- `boxcolor` - Card's languages color _(hex color)_
+- `boxcolor` - Card's box color _(hex color)_
 - `title` - Card's custom title _(string)_
 
-Example: 
-`/ranklist?users=lartrax,arvidwedtstein&bordercolor=black&titlecolor=red&textcolor=green&backgroundcolor=yellow&title=test`
+#### Repository Commitactivity Card Exclusive Options:
 
-
-> /mostactivity?org=devco-morkjebla
-
+- `hide_week` - Hides the week numbers on the card _(boolean)_
+- `repo` - The name of your repository _(github repository name)_
 
 > /commitactivity?:user&:repo
 
@@ -135,6 +165,3 @@ Make sure your request is meaningful and you have tested the app locally before 
 - Repository Timeline?
 
 
-# Copilot
-
-https://github.com/github/copilot-docs/blob/main/docs/visualstudiocode/gettingstarted.md#getting-started-with-github-copilot-in-visual-studio-code

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"githubembedapi/card/style"
 	"githubembedapi/commit_activity"
+	"githubembedapi/icons"
 	"githubembedapi/languageCard"
 	"githubembedapi/organization"
 	"githubembedapi/project"
@@ -23,6 +24,7 @@ func main() {
 	router.StaticFS("/static", http.Dir("./static"))
 	// router.StaticFile("/.env", "/.env")
 	// router.GET("/ranklist", rankList)
+	router.GET("/icon", icon)
 	router.GET("/skills", getSkills)
 	router.GET("/mostactivity", getMostactivity)
 	router.GET("/project", projectcard)
@@ -35,8 +37,8 @@ func main() {
 		fmt.Printf("Error loading .env file")
 	}
 
-	// router.Run("localhost:8080")
-	router.Run()
+	router.Run("localhost:8080")
+	// router.Run()
 }
 
 func statscard(c *gin.Context) {
@@ -129,4 +131,22 @@ func getSkills(c *gin.Context) {
 	var color = style.CheckTheme(c)
 
 	c.String(http.StatusOK, skills.Skills(title, languages, color))
+}
+
+func icon(c *gin.Context) {
+	c.Header("Content-Type", "image/svg+xml")
+
+	icon := c.Request.FormValue("icon")
+	size := c.Request.FormValue("size")
+
+	if len(size) < 1 {
+		size = "60"
+	}
+
+	svgIcon := icons.Icons(icon)
+	svgIcon = strings.ReplaceAll(svgIcon, `width='20'`, fmt.Sprintf(`width='%v'`, size))
+	svgIcon = strings.ReplaceAll(svgIcon, `height='20'`, fmt.Sprintf(`height='%v'`, size))
+	svgIcon = strings.ReplaceAll(svgIcon, `x='10'`, ``)
+	svgIcon = strings.ReplaceAll(svgIcon, `y='10'`, ``)
+	c.String(http.StatusOK, svgIcon)
 }

@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"sort"
 	"strings"
 	"time"
 )
@@ -243,17 +242,7 @@ func Stats(title string, user string, hide []string, cardstyle themes.Theme) str
 	if len(hide) > 0 {
 		for _, v := range hide {
 			if card.ArrayContains(hideoptions, v) {
-				// Sort alphabetically
-				sort.Slice(content, func(i, j int) bool {
-					return content[i] < content[j]
-				})
-				fmt.Println("--------------------")
-				for _, v2 := range content {
-					fmt.Println(v2)
-				}
-				idx := sort.Search(len(content), func(i int) bool {
-					return strings.Contains(content[i], card.ToTitleCase(v))
-				})
+				idx := card.IndexOf(v, content)
 				content = card.RemoveFromSlice(content, idx)
 			}
 		}
