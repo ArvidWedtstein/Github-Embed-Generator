@@ -196,6 +196,20 @@ func Stats(title string, user string, hide []string, cardstyle themes.Theme) str
 	// padding := 10
 	strokewidth := 3
 
+	// Calculate Disk Usage and add extension
+	var sizeType string = "B"
+	var multiplier float64 = 1
+	if totalDiskUsage < 1000000 && totalDiskUsage > 1000 {
+		sizeType = "KB"
+		multiplier = 0.001
+	} else if totalDiskUsage >= 1000000 {
+		sizeType = "MB"
+		multiplier = 0.000001
+	} else {
+		sizeType = "B"
+		multiplier = 1
+	}
+
 	customstyles := []string{
 		`@font-face { font-family: Papyrus; src: '../papyrus.TFF'}`,
 	}
@@ -211,14 +225,14 @@ func Stats(title string, user string, hide []string, cardstyle themes.Theme) str
 		body = append(body, content...)
 	}
 	content := []string{
-		fmt.Sprintf(`<text x="" y="" class="text">Total Contributions: %v</text>`, totalContributions),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Contributions: %v%v</text>`, card.ToFixed(float64(totalContributions)/1000, 1), "K"),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Milestones: %v</text>`, totalMilestones),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Packages: %v</text>`, totalPackages),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Forks: %v</text>`, totalForks),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Releases: %v</text>`, totalReleases),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Watchers: %v</text>`, totalWatchers),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Stars Earned: %v</text>`, totalStargazers),
-		fmt.Sprintf(`<text x="" y="" class="text">Total Disk Usage: %v</text>`, totalDiskUsage),
+		fmt.Sprintf(`<text x="" y="" class="text">Total Disk Usage: %v %v</text>`, card.ToFixed(float64(totalDiskUsage)*multiplier, 2), sizeType),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Pull Requests: %v</text>`, totalPullRequests),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Issues: %v</text>`, totalIssues),
 		fmt.Sprintf(`<text x="" y="" class="text">Total Repositories Contributed To: %v</text>`, repositoriesContributedTo),
