@@ -3,7 +3,6 @@
 # Generator 
 https://arvidgithubembed.herokuapp.com/static/
 
-## Better description & docs will come soon. (When i have time left)
 
 
 # Features:
