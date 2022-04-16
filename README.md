@@ -159,8 +159,5 @@ Make sure your request is meaningful and you have tested the app locally before 
 
 
 
-# TODO
-
-- Repository Timeline?
 
 
