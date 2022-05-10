@@ -529,11 +529,13 @@ func generateGrid(width, height float64) string {
 		coordsMoveX = append(coordsMoveX, num1m, num2m, num3m, num4m, num5m, num6m)
 		startMx = num6m
 	}
+
 	for i, v := range coordsLineX {
 		path = append(path, fmt.Sprintf(`M %v 212 L %v 1 `, coordsMoveX[i], v))
 	}
 	startYLine := 5.5
 	var step float64 = 2.5
+
 	for i := 0; i < 20; i++ {
 		path = append(path, fmt.Sprintf("M1 %v L%v %v", startYLine, width, startYLine))
 		if i%3 == 0 {
