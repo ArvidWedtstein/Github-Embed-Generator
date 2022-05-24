@@ -227,7 +227,7 @@ func BarChartVertical(bar Bar) string {
 	totalWidth := (columnWidth + barGap) * len(bar.Values)
 	barChart := []string{
 		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
-			totalWidth, max+120, totalWidth, max+100),
+			totalWidth, max+120, totalWidth, max+10),
 	}
 	BarChartAdd := func(content string) {
 		barChart = append(barChart, content)
@@ -348,7 +348,7 @@ func LineChart(line Line) string {
 	padding := 10
 	lineChart := []string{
 		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
-			width+padding, line.Height, width+padding, line.Height),
+			width+padding, max+(padding*4), width+padding, max+(padding*4)),
 	}
 	LineChartAdd := func(content string) {
 		lineChart = append(lineChart, content)
