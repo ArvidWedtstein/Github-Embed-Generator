@@ -263,7 +263,7 @@ func BarChartVertical(bar Bar) string {
 			}
 		} else {
 			if len(bar.Labels) > i {
-				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/><text transform="rotate(90)" x="%v" y="%v" fill="#000000" text-anchor="middle">%v</text></g>`,
+				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/><text transform="rotate(-90)" x="%v" y="%v" fill="#000000" text-anchor="middle">%v</text></g>`,
 					(20+barGap)*i, (max+30)-v, 20, v, "#ff0000", (v+20)+len(bar.Labels[i]), -5, bar.Labels[i]))
 			} else {
 				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/></g>`,
