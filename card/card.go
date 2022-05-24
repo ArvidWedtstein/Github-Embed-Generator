@@ -227,7 +227,7 @@ func BarChartVertical(bar Bar) string {
 	totalWidth := (columnWidth + barGap) * len(bar.Values)
 	barChart := []string{
 		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g>`,
-			totalWidth, max+120, totalWidth, max+120),
+			totalWidth, max+120, totalWidth, max+100),
 	}
 	BarChartAdd := func(content string) {
 		barChart = append(barChart, content)
@@ -263,7 +263,9 @@ func BarChartVertical(bar Bar) string {
 			}
 		} else {
 			if len(bar.Labels) > i {
-				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/><text transform="rotate(-90)" x="%v" y="%v" fill="#000000" text-anchor="middle">%v</text></g>`,
+				// content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/><text transform="rotate(-90)" x="%v" y="%v" fill="#000000" text-anchor="middle">%v</text></g>`,
+				// 	(20+barGap)*i, (max+30)-v, 20, v, "#ff0000", (v+0)+len(bar.Labels[i]), 10, bar.Labels[i]))
+				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/><text transform="rotate(90)" x="%v" y="%v" fill="#000000" text-anchor="middle">%v</text></g>`,
 					(20+barGap)*i, (max+30)-v, 20, v, "#ff0000", (v+20)+len(bar.Labels[i]), -5, bar.Labels[i]))
 			} else {
 				content = append(content, fmt.Sprintf(`<g transform="translate(%v,%v)" class="bar"><rect width="%v" height="%v" fill="%v"/></g>`,
