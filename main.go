@@ -50,8 +50,8 @@ func main() {
 func radar(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 	var radar card.Radar
-	values := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("values")), ",")
-	labels := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("labels")), ",")
+	values := card.UrlSplit(c, "values")
+	labels := card.UrlSplit(c, "labels")
 	for _, v := range values {
 		val, _ := strconv.Atoi(v)
 		radar.Values = append(radar.Values, val)
@@ -66,7 +66,9 @@ func radar(c *gin.Context) {
 func line(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 	var line card.Line
-	values := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("values")), ",")
+
+	values := card.UrlSplit(c, "values")
+
 	for _, v := range values {
 		val, _ := strconv.Atoi(v)
 		line.Values = append(line.Values, val)
@@ -81,8 +83,8 @@ func line(c *gin.Context) {
 func bar(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 	var bar card.Bar
-	values := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("values")), ",")
-	labels := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("labels")), ",")
+	values := card.UrlSplit(c, "values")
+	labels := card.UrlSplit(c, "labels")
 	for _, v := range values {
 		val, _ := strconv.Atoi(v)
 		bar.Values = append(bar.Values, val)
@@ -100,7 +102,7 @@ func statscard(c *gin.Context) {
 
 	user := c.Request.FormValue("user")
 	title := c.Request.FormValue("title")
-	hide := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("hide")), ",")
+	hide := card.UrlSplit(c, "hide")
 	var color = style.CheckTheme(c)
 
 	c.String(http.StatusOK, stats.Stats(title, user, hide, color))
@@ -158,7 +160,7 @@ func language(c *gin.Context) {
 func rankList(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 
-	users := strings.Split(fmt.Sprintf("%v", c.Request.FormValue("users")), ",")
+	users := card.UrlSplit(c, "users")
 	title := c.Request.FormValue("title")
 
 	var color = style.CheckTheme(c)

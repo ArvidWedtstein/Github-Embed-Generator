@@ -8,6 +8,8 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Card struct {
@@ -702,4 +704,8 @@ func IndexOf(element string, data []string) int {
 		}
 	}
 	return -1 //not found.
+}
+
+func UrlSplit(c *gin.Context, index string) []string {
+	return strings.Split(c.Request.FormValue(index), ",")
 }
