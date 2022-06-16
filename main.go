@@ -50,8 +50,10 @@ func main() {
 func radar(c *gin.Context) {
 	c.Header("Content-Type", "image/svg+xml")
 	var radar card.Radar
+
 	values := card.UrlSplit(c, "values")
 	labels := card.UrlSplit(c, "labels")
+
 	for _, v := range values {
 		val, _ := strconv.Atoi(v)
 		radar.Values = append(radar.Values, val)
