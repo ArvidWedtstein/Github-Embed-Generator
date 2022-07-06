@@ -189,7 +189,7 @@ func RadarChart(radar Radar) string {
 	centerY := (radar.Height / 2)
 	sectionDegree := 360 / (len(radar.Values))
 	radarChart := []string{
-		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="300" height="300" version="1"><g transform="translate(%v,%v) scale(0.5)" width="%v" height="%v">`, radar.PosX, radar.PosY, radar.Width, radar.Height),
+		fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %v %v" width="%v" height="%v" version="1"><g transform="translate(%v,%v) scale(1)">`, radar.Width, radar.Height, radar.Width, radar.Height, radar.PosX, radar.PosY),
 	}
 
 	if radar.Grid {
