@@ -1,9 +1,9 @@
-# syntax=docker/dockerfile:1
+
 
 # Alpine is chosen for its small footprint
 # compared to Ubuntu
 
-FROM golang:1.17-alpine
+FROM golang:1.19-alpine
 
 WORKDIR /go/src/app
 COPY . .
@@ -11,7 +11,7 @@ COPY . .
 RUN go get -d -v ./...
 RUN go install -v ./...
 
-CMD ["app"]
+
 
 # # Add Maintainer info
 # LABEL maintainer="Arvid Wedtstein"
@@ -29,11 +29,10 @@ CMD ["app"]
 
 # RUN go install
 # # Expose port 8080 to the outside world
-# EXPOSE 8080
+EXPOSE 8080
 
-# # RUN go run main.go
-# RUN go build -o /githubembedapi
+RUN go build -o /githubembedapi
 
-# CMD [ "/githubembedapi" ]
+CMD [ "/githubembedapi" ]
 
 
