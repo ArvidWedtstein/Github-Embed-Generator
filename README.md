@@ -13,7 +13,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/ArvidWedtstein/Github-Embed-Generator">
-    <img src="web/public/favicon.png" alt="Logo" width="80" height="80">
+    <img src="https://cdn.dribbble.com/users/530731/screenshots/14749816/media/d936a3a430c3010a119de23dd3980cd0.png?compress=1&resize=400x300" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Github Embed Generator</h3>
